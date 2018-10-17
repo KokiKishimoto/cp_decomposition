@@ -60,6 +60,12 @@ public:
 	   std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << ' ';
     	   }
 	   std::cout << std::endl;
+	   //for(int i=0; i<triple.size(); i++){
+    	   //    for(int j=0; j<triple.front().size(); j++){
+    	   //        std::cout << triple[i][j] << ' ';
+    	   //    }
+    	   //    std::cout << std::endl;
+    	   //}
      
         }
     }
@@ -88,34 +94,26 @@ public:
 class CP{
 public:
     CP(const std::string& file_name, const int& dim){
-	//int entity_num = 2;
 	ReadFile readfile(file_name);
 	int entity_num = readfile.entity_map.size();
-	//std::cout << readfile.entity_map["a"] << std::endl;
-	std::cout << "entity_num:" << entity_num << std::endl;
+	//std::cout << "entity_num:" << entity_num << std::endl;
     	std::vector< std::vector <float> > subject(entity_num, std::vector<float>(dim) );
     	std::vector< std::vector <float> > object(entity_num, std::vector<float>(dim) );
     	std::vector< std::vector <float> > relation(entity_num, std::vector<float>(dim) );
 	readfile.makedict();
-	for(int i=0; i<readfile.triple.size(); i++){
-    	    for(int j=0; j<readfile.triple.front().size(); j++){
-    	        std::cout << readfile.triple[i][j] << ' ';
-    	    }
-    	    std::cout << std::endl;
-    	}
     	readfile.makeid();
 
     
     }
-    void test(const std::string& file_name, const int& dim){
-	std::cout << file_name << dim << std::endl;
-    }
-    /*
-    CP(const std::string& file_name, const int& dim){
-	std::string file_name2 = file_name;
-	int dim2 = dim;
-    }
-    */
+    //void initialive_vecotor(){
+    //    std::random_device rnd;     // ?????????????
+    //	std::mt19937 mt(rnd());     //  ???????????32??????????????
+    //	std::uniform_int_distribution<> rand100(0, 99);        // [0, 99] ???????
+    //	for (int i = 0; i < 20; ++i) {
+    //	    std::cout << rand100(mt) << "\n";
+    //}
+
+    //}
 
 
 };
