@@ -56,8 +56,12 @@ public:
     	   if(entity_map.find(triple[i][2]) == entity_map.end()){
     	   	    entity_map[triple[i][2]] = entity_cnt;
     	   	    entity_cnt++;
+	   std::cout << triple[i][0] << ':' << entity_map[triple[i][0]] << ' ';
+	   std::cout << triple[i][1] << ':' << relation_map[triple[i][1]] << ' ';
+	   std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << ' ';
     	   }
-        
+	   std::cout << std::endl;
+     
         }
     }
 };
@@ -72,8 +76,9 @@ int main(int argc, char *argv[]) {
     
     for(int i=0; i<readfile.triple.size(); i++){
 	for(int j=0; j<readfile.triple.front().size(); j++){
-	    std::cout << readfile.triple[i][j] << std::endl;
+	    std::cout << readfile.triple[i][j] << ' ';
 	}
+	std::cout << std::endl;
     }
 
     return 0;
