@@ -10,87 +10,104 @@
 
 class ReadFile{
 public:
-    std::fstream fs;
-    std::vector< std::vector <std::string> > triple;
-    std::string l,m,n;
-    std::map<std::string, int> entity_map;
-    std::map<std::string, int> relation_map;
-    std::vector< std::vector <int> > tripleID;
-    //ReadFile(){}
-    ReadFile(const std::string& file_name){
-	load(file_name); 
-    }
-    int load(const std::string& file_name){
-	std::vector<std::string> tmp(3);
-        fs.open(file_name, std::ios::in);
-        if(! fs.is_open()) {
-            return EXIT_FAILURE;
-        }
-        while (fs >> l >> m >> n){
-    	tmp[0] = l;
-    	tmp[1] = m;
-    	tmp[2] = n;
-    
-    	//std::cout << tmp[0] << tmp[1] << tmp[2] << std::endl;
-    	triple.push_back(tmp);
-        }
-    
-        fs.close(); 
-	return 0;
-    }
-
-    void makedict(void){
-	int entity_cnt = 0;
-    	int relation_cnt = 0;
-    	//std::cout << triple.size() << std::endl;
-    	for(int i=0; i<triple.size(); i++){
-	   if(entity_map.find(triple[i][0]) == entity_map.end()){
-    	   	    entity_map[triple[i][0]] = entity_cnt;
-    	   	    entity_cnt++;
-    	   }
-    	   if(relation_map.find(triple[i][1]) == relation_map.end()){
-    	   	    relation_map[triple[i][1]] = relation_cnt;
-    	   	    relation_cnt++;
-    	   }
-    	   if(entity_map.find(triple[i][2]) == entity_map.end()){
-    	   	    entity_map[triple[i][2]] = entity_cnt;
-    	   	    entity_cnt++;
-	   std::cout << triple[i][0] << ':' << entity_map[triple[i][0]] << ' ';
-	   std::cout << triple[i][1] << ':' << relation_map[triple[i][1]] << ' ';
-	   std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << ' ';
-    	   }
-	   std::cout << std::endl;
-	   //for(int i=0; i<triple.size(); i++){
-    	   //    for(int j=0; j<triple.front().size(); j++){
-    	   //        std::cout << triple[i][j] << ' ';
-    	   //    }
-    	   //    std::cout << std::endl;
-    	   //}
-     
-        }
-    }
-    void makeid(void){
-    	std::vector<int> tmp(3);
-        for(int i=0; i<triple.size(); i++){
-	   //std::cout << triple[i][0] << std::endl;
-    	   //std::cout << "key:" << triple[i][0] << "value:" << entity_map[triple[i][0]] << std::endl;
-    
-    	   tmp[0] = entity_map[triple[i][0]];
-    	   tmp[1] = relation_map[triple[i][1]];
-    	   tmp[2] = entity_map[triple[i][2]];
-    
-    	   std::cout << tmp[0] << ' ' << tmp[1] << ' ' << tmp[2];
-    	   tripleID.push_back(tmp);
-    	   std::cout << std::endl;
-    
-    
-    	   //std::cout << tripleID[i][0] << ' ';
-    	   //std::cout << tripleID[i][1] << ' ';
-    	   //std::cout << tripleID[i][2] << ' ';
+	std::vector< std::vector <std::string> > triple;
+	ReadFile(){}
+	std::vector< std::vector <std::string> > load(const std::string& file_name){
+        	std::fstream fs;
+		std::vector<std::string> tmp(3);
+		std::string l,m,n;
+		fs.open(file_name, std::ios::in);
+		//if(! fs.is_open()) {
+		//return EXIT_FAILURE;
+		//}
+		while (fs >> l >> m >> n){
+			tmp[0] = l;
+			tmp[1] = m;
+			tmp[2] = n;
+			
+			//std::cout << tmp[0] << tmp[1] << tmp[2] << std::endl;
+			triple.push_back(tmp);
+		}
+		
+		fs.close(); 
+		return triple;
 	}
-    }
+	//int __len__(void){
+
+	//}
+};
+class MakeDict{
+public:	
+	std::map<std::string, int> entity_map;
+	std::map<std::string, int> relation_map;
+	MakeDict(){}
+	std::map<std::string, int> entitydict(std::vector< std::vector < std::string > >& triple){
+		int entity_cnt = 0;
+		for(int i=0; i<triple.size(); i++){
+			if(entity_map.find(triple[i][0]) == entity_map.end()){
+				entity_map[triple[i][0]] = entity_cnt;
+				entity_cnt++;
+			}
+			if(entity_map.find(triple[i][2]) == entity_map.end()){
+				entity_map[triple[i][2]] = entity_cnt;
+				entity_cnt++;
+			}
+		std::cout << triple[i][0] << ':' << entity_map[triple[i][0]] << ' ';
+		std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << ' ';
+		}
+		std::cout << std::endl;
+		return entity_map;
+	}
+
+	std::map<std::string, int> relationdict(std::vector< std::vector < std::string > >&triple){
+		int relation_cnt = 0;
+		for(int i=0; i<triple.size(); i++){
+			if(relation_map.find(triple[i][1]) == relation_map.end()){
+				relation_map[triple[i][1]] = relation_cnt;
+				relation_cnt++;
+			}
+		std::cout << triple[i][1] << ':' << relation_map[triple[i][1]] << ' ';
+		}
+		std::cout << std::endl;
+		return relation_map;
+	}
+//for(int i=0; i<triple.size(); i++){
+    //    for(int j=0; j<triple.front().size(); j++){
+    //        std::cout << triple[i][j] << ' ';
+    //    }
+    //    std::cout << std::endl;
+    //}
 };
 
+
+class ToID{
+public:
+	std::vector< std::vector < int > > tripleID;
+	ToID(){}
+	std::vector< std::vector < int > > makeid(std::map<std::string, int>& entity_map, std::map<std::string, int>& relation_map, std::vector< std::vector < std::string > >& triple){
+		std::vector<int> tmp(3);
+		for(int i=0; i<triple.size(); i++){
+//std::c	out << triple[i][0] << std::endl;
+//std::c	out << "key:" << triple[i][0] << "value:" << entity_map[triple[i][0]] << std::endl;
+    
+			tmp[0] = entity_map[triple[i][0]];
+			tmp[1] = relation_map[triple[i][1]];
+			tmp[2] = entity_map[triple[i][2]];
+
+			std::cout << tmp[0] << ' ' << tmp[1] << ' ' << tmp[2];
+			tripleID.push_back(tmp);
+			std::cout << std::endl;
+
+
+//std::cout << tripleID[i][0] << ' ';
+//std::cout << tripleID[i][1] << ' ';
+//std::cout << tripleID[i][2] << ' ';
+		}
+		return tripleID;
+	}
+};
+
+/*
 class CP{
 public:
     CP(const std::string& file_name, const int& dim){
@@ -105,6 +122,8 @@ public:
 
     
     }
+};
+    */
     //void initialive_vecotor(){
     //    std::random_device rnd;     // ?????????????
     //	std::mt19937 mt(rnd());     //  ???????????32??????????????
@@ -116,14 +135,34 @@ public:
     //}
 
 
-};
 
 int main(int argc, char *argv[]) {
-    //std::string read_triple_file = argv[1]; 
-    //std::string dim = int(argv[2]); 
-    //int dim = argv[1]; 
+	//std::string read_triple_file = argv[1]; 
+	//std::string dim = int(argv[2]); 
+	//int dim = argv[1]; 
+	ReadFile readfile;
+	std::vector< std::vector <std::string> > triple = readfile.load(argv[1]); 
+	for(int i=0; i<2; i++){
+	    for(int j=0; j<3;j++){
+	        std::cout << triple[i][j];
+	    }
+	std::cout << std::endl;
+	}
+	MakeDict makedict;
+	std::map<std::string, int> entity_map = makedict.entitydict(triple);
+	std::map<std::string, int> relation_map= makedict.relationdict(triple);
+	ToID toid;
+	std::vector< std::vector < int > > tripleID = toid.makeid(entity_map, relation_map, triple);
+	for(int i=0; i<2; i++){
+	    for(int j=0; j<3;j++){
+	        std::cout << tripleID[i][j];
+	    }
+	std::cout << std::endl;
+	}
 
-    CP cp(argv[1], atoi(argv[2]));
+
+
+    //CP cp(argv[1], atoi(argv[2]));
     //CP cp("test.dat", 400);
     /*
     ReadFile readfile(argv[1]);
