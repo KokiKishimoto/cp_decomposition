@@ -5,6 +5,7 @@
 #include <cstdlib> 
 #include <set>
 #include <map>
+#include <stdlib.h>
 
 
 class ReadFile{
@@ -14,6 +15,7 @@ public:
     std::string l,m,n;
     std::map<std::string, int> entity_map;
     std::map<std::string, int> relation_map;
+    std::vector< std::vector <int> > tripleID;
     //ReadFile(){}
     ReadFile(const std::string& file_name){
 	load(file_name); 
@@ -25,9 +27,6 @@ public:
             return EXIT_FAILURE;
         }
         while (fs >> l >> m >> n){
-        	// cin のように一行読み込む
-    	//int l,m,n;
-        	//fs >> l >> m >> n;
     	tmp[0] = l;
     	tmp[1] = m;
     	tmp[2] = n;
@@ -40,7 +39,7 @@ public:
 	return 0;
     }
 
-    void makeid(void){
+    void makedict(void){
 	int entity_cnt = 0;
     	int relation_cnt = 0;
     	//std::cout << triple.size() << std::endl;
@@ -64,14 +63,74 @@ public:
      
         }
     }
+    void makeid(void){
+    	std::vector<int> tmp(3);
+        for(int i=0; i<triple.size(); i++){
+	   //std::cout << triple[i][0] << std::endl;
+    	   //std::cout << "key:" << triple[i][0] << "value:" << entity_map[triple[i][0]] << std::endl;
+    
+    	   tmp[0] = entity_map[triple[i][0]];
+    	   tmp[1] = relation_map[triple[i][1]];
+    	   tmp[2] = entity_map[triple[i][2]];
+    
+    	   std::cout << tmp[0] << ' ' << tmp[1] << ' ' << tmp[2];
+    	   tripleID.push_back(tmp);
+    	   std::cout << std::endl;
+    
+    
+    	   //std::cout << tripleID[i][0] << ' ';
+    	   //std::cout << tripleID[i][1] << ' ';
+    	   //std::cout << tripleID[i][2] << ' ';
+	}
+    }
+};
+
+class CP{
+public:
+    CP(const std::string& file_name, const int& dim){
+	//int entity_num = 2;
+	ReadFile readfile(file_name);
+	int entity_num = readfile.entity_map.size();
+	//std::cout << readfile.entity_map["a"] << std::endl;
+	std::cout << "entity_num:" << entity_num << std::endl;
+    	std::vector< std::vector <float> > subject(entity_num, std::vector<float>(dim) );
+    	std::vector< std::vector <float> > object(entity_num, std::vector<float>(dim) );
+    	std::vector< std::vector <float> > relation(entity_num, std::vector<float>(dim) );
+	readfile.makedict();
+	for(int i=0; i<readfile.triple.size(); i++){
+    	    for(int j=0; j<readfile.triple.front().size(); j++){
+    	        std::cout << readfile.triple[i][j] << ' ';
+    	    }
+    	    std::cout << std::endl;
+    	}
+    	readfile.makeid();
+
+    
+    }
+    void test(const std::string& file_name, const int& dim){
+	std::cout << file_name << dim << std::endl;
+    }
+    /*
+    CP(const std::string& file_name, const int& dim){
+	std::string file_name2 = file_name;
+	int dim2 = dim;
+    }
+    */
+
+
 };
 
 int main(int argc, char *argv[]) {
-    std::string read_triple_file = argv[1]; 
+    //std::string read_triple_file = argv[1]; 
+    //std::string dim = int(argv[2]); 
+    //int dim = argv[1]; 
 
+    CP cp(argv[1], atoi(argv[2]));
+    //CP cp("test.dat", 400);
+    /*
     ReadFile readfile(argv[1]);
     //std::cout << readfile.triple[0][1] << std::endl;
-    readfile.makeid();
+    readfile.makedict();
     
     
     for(int i=0; i<readfile.triple.size(); i++){
@@ -80,6 +139,8 @@ int main(int argc, char *argv[]) {
 	}
 	std::cout << std::endl;
     }
+    readfile.makeid();
+    */
 
     return 0;
 }
