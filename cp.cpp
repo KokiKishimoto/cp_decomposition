@@ -97,6 +97,7 @@ public:
 	std::vector< std::vector <float> > relation;
 	std::vector< std::vector <float> > object;
 	int dim;
+	float learning_rate = 0.025;
 	//std::vector< std::vector <float> > object;
 	//std::vector< std::vector <float> > relation;
 	//std::vector<int> subject;
@@ -134,7 +135,7 @@ public:
 		std::random_device rnd;     // 非決定的な乱数生成器を生成
     		std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
     		std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*data.tripleID.size()), sqrt(6)/sqrt(2*data.tripleID.size()));
-		std::cout << "size:"<< size << std::endl;
+		//std::cout << "size:"<< size << std::endl;
 		for(int i=0;i<size;i++){
 			//std::cout << '[';
 			for(int j=0;j<dim;j++){
@@ -160,17 +161,6 @@ public:
 		return score;
 	}
 
-	float computgradient(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
-		float score = scorefuntion(vector1, vector2, vector3);
-		float sigmoidscore = sigmoid(score);
-		std::vector< float > vecotor_product;
-		float gradient;
-		for(int i=0;i<dim;i++){
-			vecotor_product = vector2[i] * vector3[i];
-		}
-		gradient = - std::exp(score) * sigmoidscore * vecotor_product;
-		return gradient;
-	}
 
 	float sigmoid(float& score){
 		float sigmoid;
@@ -178,23 +168,64 @@ public:
 		return sigmoid;
 	}
 
+	std::vector< float > computgradient(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+		float score = scorefuntion(vector1, vector2, vector3);
+		float sigmoidscore = sigmoid(score);
+		std::vector< float > vecotor_product(dim);
+		std::vector< float > gradient(dim);
+		//std::cout << gradient.size() << std::endl;
+		for(int i=0;i<dim;i++){
+			vecotor_product[i] = vector2[i] * vector3[i];
+		}
+		for(int i=0;i<dim;i++){
+			gradient[i] = - std::exp(-score) * sigmoidscore * vecotor_product[i];
+		}
+		return gradient;
+	}
+
+	std::vector< float > updater(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+		std::vector< float > gradient2(dim);
+		gradient2 = computgradient(vector1, vector2, vector3);
+		for(int i=0; i<dim; i++){
+			vector1[i] = vector1[i] - learning_rate * gradient2[i];
+			//std::cout << vector1[i];
+		}
+		return vector1;
+	}
+
+
 
 	void train(void){
 		randominitialize(subject, data.entity_num);
-		randominitialize(relation, data.relation_num);
 		randominitialize(object, data.entity_num);
-		std::vector< float > subject_vector = subject[1];
-		std::vector< float > relation_vector = relation[1];
-		std::vector< float > object_vector = object[1];
-		//std::cout << '[';
-		//for(int i=0;i<dim;i++){
-		//	std::cout << vector[i] << ' ';
-		//}
-		//std::cout << ']' << std::endl;
-		//std::cout << vector.size();	
-
-		for(int i=0; i<1000; i++){
-			std::cout << computgradient(subject_vector, relation_vector, object_vector) << std::endl;
+		randominitialize(relation, data.relation_num);
+		//std::cout << subject[0][0] << ' ';
+		float score;
+		for(int i=0; i<10; i++){
+			for (auto j: data.tripleID){
+				std::cout << '[' << j[0] <<',' << j[1] << ',' << j[2] << ']';
+				//std::vector< float > subject_vector = subject[1];
+				//std::vector< float > relation_vector = relation[1];
+				//std::vector< float > object_vector = object[1];
+				//std::cout << subject[0][0] << ' ' << std::endl;
+				
+				//for(int j=0; j<dim; j++){
+					//std::cout << subject[2][j] << ' ';
+					//std::cout << object[1][j] << ' ';
+				//}
+				//std::cout << std::endl;
+				//score = scorefuntion(subject[i[0]], object[i[1]],relation[i[2]]);
+				score = scorefuntion(subject[j[0]], object[j[2]], relation[j[1]]);
+				std::cout << score;
+				//for(int j=0; j<dim; j++){
+					//std::cout << subject_vector[j] << ' ';
+					subject[j[0]]= updater(subject[j[0]], object[j[2]], relation[j[1]]);
+					object[j[2]]= updater(object[j[2]], subject[j[0]], relation[j[1]]);
+					relation[j[1]]= updater(relation[j[1]], subject[j[0]], object[j[1]]);
+					//std::cout << subject_vector[j] << ' ';
+				//}
+			}
+			std::cout << std::endl;
 		}
 
 	}
