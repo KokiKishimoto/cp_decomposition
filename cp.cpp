@@ -6,12 +6,20 @@
 #include <set>
 #include <map>
 #include <stdlib.h>
+#include <random>
+#include <math.h>
+#include <cmath>
+#include <limits>
 
-
-class ReadFile{
+class Data{
 public:
 	std::vector< std::vector <std::string> > triple;
-	ReadFile(){}
+	std::map<std::string, int> entity_map;
+	std::map<std::string, int> relation_map;
+	std::vector< std::vector < int > > tripleID;
+	int entity_num;
+	int relation_num;
+	Data(){}
 	std::vector< std::vector <std::string> > load(const std::string& file_name){
         	std::fstream fs;
 		std::vector<std::string> tmp(3);
@@ -32,15 +40,6 @@ public:
 		fs.close(); 
 		return triple;
 	}
-	//int __len__(void){
-
-	//}
-};
-class MakeDict{
-public:	
-	std::map<std::string, int> entity_map;
-	std::map<std::string, int> relation_map;
-	MakeDict(){}
 	std::map<std::string, int> entitydict(std::vector< std::vector < std::string > >& triple){
 		int entity_cnt = 0;
 		for(int i=0; i<triple.size(); i++){
@@ -52,78 +51,154 @@ public:
 				entity_map[triple[i][2]] = entity_cnt;
 				entity_cnt++;
 			}
-		std::cout << triple[i][0] << ':' << entity_map[triple[i][0]] << ' ';
-		std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << ' ';
+		//std::cout << triple[i][0] << ':' << entity_map[triple[i][0]] << ' ';
+		//std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << ' ';
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
+		entity_num = entity_cnt;
 		return entity_map;
 	}
-
-	std::map<std::string, int> relationdict(std::vector< std::vector < std::string > >&triple){
-		int relation_cnt = 0;
+	std::map<std::string, int> relationdict(std::vector< std::vector < std::string > >& triple){
+		int relation_cnt= 0;
 		for(int i=0; i<triple.size(); i++){
 			if(relation_map.find(triple[i][1]) == relation_map.end()){
 				relation_map[triple[i][1]] = relation_cnt;
 				relation_cnt++;
 			}
-		std::cout << triple[i][1] << ':' << relation_map[triple[i][1]] << ' ';
+		//std::cout << triple[i][1] << ':' << entity_map[triple[i][1]] << ' ';
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
+		relation_num = relation_cnt;
 		return relation_map;
 	}
-//for(int i=0; i<triple.size(); i++){
-    //    for(int j=0; j<triple.front().size(); j++){
-    //        std::cout << triple[i][j] << ' ';
-    //    }
-    //    std::cout << std::endl;
-    //}
-};
-
-
-class ToID{
-public:
-	std::vector< std::vector < int > > tripleID;
-	ToID(){}
 	std::vector< std::vector < int > > makeid(std::map<std::string, int>& entity_map, std::map<std::string, int>& relation_map, std::vector< std::vector < std::string > >& triple){
 		std::vector<int> tmp(3);
 		for(int i=0; i<triple.size(); i++){
-//std::c	out << triple[i][0] << std::endl;
-//std::c	out << "key:" << triple[i][0] << "value:" << entity_map[triple[i][0]] << std::endl;
     
 			tmp[0] = entity_map[triple[i][0]];
 			tmp[1] = relation_map[triple[i][1]];
 			tmp[2] = entity_map[triple[i][2]];
 
-			std::cout << tmp[0] << ' ' << tmp[1] << ' ' << tmp[2];
+			//std::cout << tmp[0] << ' ' << tmp[1] << ' ' << tmp[2];
 			tripleID.push_back(tmp);
-			std::cout << std::endl;
+			//std::cout << std::endl;
 
 
-//std::cout << tripleID[i][0] << ' ';
-//std::cout << tripleID[i][1] << ' ';
-//std::cout << tripleID[i][2] << ' ';
 		}
 		return tripleID;
 	}
 };
 
-/*
+
+
 class CP{
 public:
-    CP(const std::string& file_name, const int& dim){
-	ReadFile readfile(file_name);
-	int entity_num = readfile.entity_map.size();
-	//std::cout << "entity_num:" << entity_num << std::endl;
-    	std::vector< std::vector <float> > subject(entity_num, std::vector<float>(dim) );
-    	std::vector< std::vector <float> > object(entity_num, std::vector<float>(dim) );
-    	std::vector< std::vector <float> > relation(entity_num, std::vector<float>(dim) );
-	readfile.makedict();
-    	readfile.makeid();
+	std::vector< std::vector <float> > subject;
+	std::vector< std::vector <float> > relation;
+	std::vector< std::vector <float> > object;
+	int dim;
+	//std::vector< std::vector <float> > object;
+	//std::vector< std::vector <float> > relation;
+	//std::vector<int> subject;
+	Data data;
+	//std::vector< std::vector <float> > subject(entity_num, std::vector<float>(dim) );
+	//std::vector< std::vector <float> > object(entity_num, std::vector<float>(dim) );
+	//std::vector< std::vector <float> > relation(entity_num, std::vector<float>(dim) );
+	CP(const std::string& filename, const int& dimension){
+		//Data data;
+		dim= dimension;
+		data.load(filename); 
+		//for(int i=0; i<2; i++){
+		//    for(int j=0; j<3;j++){
+		//        std::cout << data.triple[i][j];
+		//    }
+		//std::cout << std::endl;
+		//}
+		data.entitydict(data.triple);
+		data.relationdict(data.triple);
+		data.makeid(data.entity_map, data.relation_map, data.triple);
+		for(int i=0; i<2; i++){
+		    for(int j=0; j<3;j++){
+		        std::cout << data.tripleID[i][j];
+		    }
+		std::cout << std::endl;
+		}
+		std::cout << "entity_num:" << data.entity_num << std::endl;
+		std::cout << "relation_num:" << data.relation_num<< std::endl;
+	}
+		
+	void randominitialize(std::vector< std::vector< float > >& matrix, const int&size){
+		//subject[0].push_back(1);
+		//std::cout << "size:" << data.tripleID.size() << std::endl;
+		matrix.push_back(std::vector<float>());
+		std::random_device rnd;     // 非決定的な乱数生成器を生成
+    		std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
+    		std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*data.tripleID.size()), sqrt(6)/sqrt(2*data.tripleID.size()));
+		std::cout << "size:"<< size << std::endl;
+		for(int i=0;i<size;i++){
+			//std::cout << '[';
+			for(int j=0;j<dim;j++){
+				matrix[i].push_back(rand100(mt));
+				//std::cout << matrix[i][j] << ',';
+			}
+			//std::cout << ']' << std::endl;
+			matrix.push_back(std::vector<float>());
+		//for(int i=0;i<data.tripleID.size();i++){
+		//	for(int j=0;j<3;j++){
+		//	std::cout << subject[i][j];
+		//	}
+		//	std::cout << std::endl;
+		//}
 
-    
-    }
+		}
+	}
+	float scorefuntion(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+		float score = 0;
+		for (int i=0;i<dim;i++){
+			score += vector1[i] * vector2[i] * vector3[i];
+		}
+		return score;
+	}
+
+	float computgradient(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+		float score = scorefuntion(vector1, vector2, vector3);
+		float sigmoidscore = sigmoid(score);
+		std::vector< float > vecotor_product;
+		float gradient;
+		for(int i=0;i<dim;i++){
+			vecotor_product = vector2[i] * vector3[i];
+		}
+		gradient = - std::exp(score) * sigmoidscore * vecotor_product;
+		return gradient;
+	}
+
+	float sigmoid(float& score){
+		float sigmoid;
+		sigmoid = 1 / (1 + std::exp(-score));
+		return sigmoid;
+	}
+
+
+	void train(void){
+		randominitialize(subject, data.entity_num);
+		randominitialize(relation, data.relation_num);
+		randominitialize(object, data.entity_num);
+		std::vector< float > subject_vector = subject[1];
+		std::vector< float > relation_vector = relation[1];
+		std::vector< float > object_vector = object[1];
+		//std::cout << '[';
+		//for(int i=0;i<dim;i++){
+		//	std::cout << vector[i] << ' ';
+		//}
+		//std::cout << ']' << std::endl;
+		//std::cout << vector.size();	
+
+		for(int i=0; i<1000; i++){
+			std::cout << computgradient(subject_vector, relation_vector, object_vector) << std::endl;
+		}
+
+	}
 };
-    */
     //void initialive_vecotor(){
     //    std::random_device rnd;     // ?????????????
     //	std::mt19937 mt(rnd());     //  ???????????32??????????????
@@ -137,152 +212,39 @@ public:
 
 
 int main(int argc, char *argv[]) {
-	//std::string read_triple_file = argv[1]; 
-	//std::string dim = int(argv[2]); 
-	//int dim = argv[1]; 
-	ReadFile readfile;
-	std::vector< std::vector <std::string> > triple = readfile.load(argv[1]); 
+	/*
+	Data data;
+	data.load(argv[1]); 
 	for(int i=0; i<2; i++){
 	    for(int j=0; j<3;j++){
-	        std::cout << triple[i][j];
+	        std::cout << data.triple[i][j];
 	    }
 	std::cout << std::endl;
 	}
-	MakeDict makedict;
-	std::map<std::string, int> entity_map = makedict.entitydict(triple);
-	std::map<std::string, int> relation_map= makedict.relationdict(triple);
-	ToID toid;
-	std::vector< std::vector < int > > tripleID = toid.makeid(entity_map, relation_map, triple);
+	data.entitydict(data.triple);
+	data.relationdict(data.triple);
+	data.makeid(data.entity_map, data.relation_map, data.triple);
 	for(int i=0; i<2; i++){
 	    for(int j=0; j<3;j++){
-	        std::cout << tripleID[i][j];
+	        std::cout << data.tripleID[i][j];
 	    }
 	std::cout << std::endl;
 	}
+	*/
 
-
-
-    //CP cp(argv[1], atoi(argv[2]));
-    //CP cp("test.dat", 400);
-    /*
-    ReadFile readfile(argv[1]);
-    //std::cout << readfile.triple[0][1] << std::endl;
-    readfile.makedict();
-    
-    
-    for(int i=0; i<readfile.triple.size(); i++){
-	for(int j=0; j<readfile.triple.front().size(); j++){
-	    std::cout << readfile.triple[i][j] << ' ';
-	}
+	std::string filename = argv[1];
+	int dimension = atoi(argv[2]);
+	CP cp(filename, dimension);
+	cp.train();
+	/*
+	for(int i=0; i<2; i++){
+	    for(int j=0; j<3;j++){
+	        std::cout << cp.data.tripleID[i][j];
+	    }
 	std::cout << std::endl;
-    }
-    readfile.makeid();
-    */
+	}
+	*/
 
-    return 0;
+	return 0;
 }
 
-/*
-class CP{
-    CP(){}
-
-
-    int ReadFile(const std::string& read_triple_file ,std::vector< std::vector <std::string> >& triple){
-        std::vector<std::string> tmp(3);
-        std::fstream fs;
-        std::string l,m,n;
-        fs.open(read_triple_file, std::ios::in);
-        //fs.open("test.dat", std::ios::in);
-        if(! fs.is_open()) {
-            return EXIT_FAILURE;
-        }
-        while (fs >> l >> m >> n){
-        	// cin のように一行読み込む
-    	//int l,m,n;
-        	//fs >> l >> m >> n;
-    	tmp[0] = l;
-    	tmp[1] = m;
-    	tmp[2] = n;
-    
-    	//std::cout << tmp[0] << tmp[1] << tmp[2] << std::endl;
-    	triple.push_back(tmp);
-        }
-    
-        fs.close(); // デストラクタでも閉じてくれますが、明示的に閉じる習慣を。
-        return 0;
-    
-    }
-    void ID(const std::vector< std::vector <std::string> >& triple, std::map<std::string, int>& entity_map, std::map<std::string, int>& relation_map){
-        int entity_cnt = 0;
-        int relation_cnt = 0;
-        //std::cout << triple.size() << std::endl;
-        for(int i=0; i<triple.size(); i++){
-    	//entity_set.insert(triple[i][0]);
-    	//entity_set.insert(triple[i][2]);
-    	//relation_set.insert(triple[i][1]);
-    	if(entity_map.find(triple[i][0]) == entity_map.end()){
-    	    entity_map[triple[i][0]] = entity_cnt;
-    	    entity_cnt++;
-    	}
-    	if(relation_map.find(triple[i][1]) == relation_map.end()){
-    	    relation_map[triple[i][1]] = relation_cnt;
-    	    relation_cnt++;
-    	}
-    	if(entity_map.find(triple[i][2]) == entity_map.end()){
-    	    entity_map[triple[i][2]] = entity_cnt;
-    	    entity_cnt++;
-    	}
-    
-    	//std::cout << triple[i][0] << ':' << entity_map[triple[i][0]] << std::endl;
-    	//std::cout << triple[i][2] << ':' << entity_map[triple[i][2]] << std::endl;
-    	//std::cout << triple[i][1] << ':' << relation_map[triple[i][1]] << std::endl;
-        }
-    }
-    
-    void ToID(std::vector< std::vector <std::string> >& triple, std::vector< std::vector <int> >& tripleID, std::map<std::string, int> entity_map, std::map<std::string, int>& relation_map){
-        for(int i=0; i<triple.size(); i++){
-    	//std::cout << triple[i][0] << std::endl;
-    	//std::cout << "key:" << triple[i][0] << "value:" << entity_map[triple[i][0]] << std::endl;
-    	std::vector<int> tmp(3);
-    
-    	tmp[0] = entity_map[triple[i][0]];
-    	tmp[1] = relation_map[triple[i][1]];
-    	tmp[2] = entity_map[triple[i][2]];
-    
-    	std::cout << tmp[0] << ' ' << tmp[1] << ' ' << tmp[2];
-    	tripleID.push_back(tmp);
-    	std::cout << std::endl;
-    
-    
-    	//std::cout << tripleID[i][0] << ' ';
-    	//std::cout << tripleID[i][1] << ' ';
-    	//std::cout << tripleID[i][2] << ' ';
-        }
-    }
-}
-
-
-int main(int argc, char *argv[]) {
-    std::string read_triple_file = argv[1]; 
-    std::vector< std::vector <std::string> > triple;
-    ReadFile(read_triple_file, triple);
-    //std::vector< std::vector <float> > subject;
-    //std::vector< std::vector <float> > object;
-    //std::vector< std::vector <float> > relation;
-    //std::set<std::string> entity_set; 
-    //std::set<std::string> relation_set; 
-    std::map<std::string, int> entity_map;
-    std::map<std::string, int> relation_map;
-    ID(triple, entity_map, relation_map); 
-
-    std::vector< std::vector <int> > tripleID;
-    ToID(triple, tripleID, entity_map, relation_map);
-
-    //std::vector< std::vector <float> > subject;
-    //std::vector< std::vector <float> > object;
-    //std::vector< std::vector <float> > relation;
-
-
-    return 0;
-}
-*/
