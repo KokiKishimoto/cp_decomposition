@@ -201,31 +201,21 @@ public:
 		randominitialize(relation, data.relation_num);
 		//std::cout << subject[0][0] << ' ';
 		float score;
+		float sigmoidscore;
 		for(int i=0; i<10; i++){
 			for (auto j: data.tripleID){
-				std::cout << '[' << j[0] <<',' << j[1] << ',' << j[2] << ']';
-				//std::vector< float > subject_vector = subject[1];
-				//std::vector< float > relation_vector = relation[1];
-				//std::vector< float > object_vector = object[1];
-				//std::cout << subject[0][0] << ' ' << std::endl;
-				
-				//for(int j=0; j<dim; j++){
-					//std::cout << subject[2][j] << ' ';
-					//std::cout << object[1][j] << ' ';
-				//}
-				//std::cout << std::endl;
+				//std::cout << '[' << j[0] <<',' << j[1] << ',' << j[2] << ']';
 				//score = scorefuntion(subject[i[0]], object[i[1]],relation[i[2]]);
 				score = scorefuntion(subject[j[0]], object[j[2]], relation[j[1]]);
-				std::cout << score;
-				//for(int j=0; j<dim; j++){
-					//std::cout << subject_vector[j] << ' ';
-					subject[j[0]]= updater(subject[j[0]], object[j[2]], relation[j[1]]);
-					object[j[2]]= updater(object[j[2]], subject[j[0]], relation[j[1]]);
-					relation[j[1]]= updater(relation[j[1]], subject[j[0]], object[j[1]]);
-					//std::cout << subject_vector[j] << ' ';
-				//}
+				sigmoidscore = sigmoid(score);
+				//std::cout << score;
+				//std::cout << sigmoidscore;
+				subject[j[0]]= updater(subject[j[0]], object[j[2]], relation[j[1]]);
+				object[j[2]]= updater(object[j[2]], subject[j[0]], relation[j[1]]);
+				relation[j[1]]= updater(relation[j[1]], subject[j[0]], object[j[1]]);
 			}
-			std::cout << std::endl;
+			std::cout << i << std::endl;
+			//std::cout << std::endl;
 		}
 
 	}
