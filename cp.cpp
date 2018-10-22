@@ -98,29 +98,16 @@ public:
 	std::vector< std::vector <float> > object;
 	int dim;
 	float learning_rate = 0.025;
-	//std::vector< std::vector <float> > object;
-	//std::vector< std::vector <float> > relation;
-	//std::vector<int> subject;
 	Data data;
-	//std::vector< std::vector <float> > subject(entity_num, std::vector<float>(dim) );
-	//std::vector< std::vector <float> > object(entity_num, std::vector<float>(dim) );
-	//std::vector< std::vector <float> > relation(entity_num, std::vector<float>(dim) );
 	CP(const std::string& filename, const int& dimension){
-		//Data data;
 		dim= dimension;
 		data.load(filename); 
-		//for(int i=0; i<2; i++){
-		//    for(int j=0; j<3;j++){
-		//        std::cout << data.triple[i][j];
-		//    }
-		//std::cout << std::endl;
-		//}
 		data.entitydict(data.triple);
 		data.relationdict(data.triple);
 		data.makeid(data.entity_map, data.relation_map, data.triple);
-		for(int i=0; i<2; i++){
+		for(int i=0; i<data.tripleID.size(); i++){
 		    for(int j=0; j<3;j++){
-		        std::cout << data.tripleID[i][j];
+		        std::cout << data.tripleID[i][j] << ' ';
 		    }
 		std::cout << std::endl;
 		}
@@ -129,29 +116,17 @@ public:
 	}
 		
 	void randominitialize(std::vector< std::vector< float > >& matrix, const int&size){
-		//subject[0].push_back(1);
-		//std::cout << "size:" << data.tripleID.size() << std::endl;
-		matrix.push_back(std::vector<float>());
+		matrix = std::vector<std::vector<float>> (size, std::vector<float>(dim));
 		std::random_device rnd;     // 非決定的な乱数生成器を生成
     		std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
     		std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*data.tripleID.size()), sqrt(6)/sqrt(2*data.tripleID.size()));
-		//std::cout << "size:"<< size << std::endl;
+    		//std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*10), sqrt(6)/sqrt(2*10));
 		for(int i=0;i<size;i++){
-			//std::cout << '[';
 			for(int j=0;j<dim;j++){
-				matrix[i].push_back(rand100(mt));
-				//std::cout << matrix[i][j] << ',';
+				matrix[i][j] = rand100(mt);
 			}
-			//std::cout << ']' << std::endl;
-			matrix.push_back(std::vector<float>());
-		//for(int i=0;i<data.tripleID.size();i++){
-		//	for(int j=0;j<3;j++){
-		//	std::cout << subject[i][j];
-		//	}
-		//	std::cout << std::endl;
-		//}
-
 		}
+
 	}
 	float scorefuntion(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
 		float score = 0;
@@ -173,98 +148,151 @@ public:
 		float sigmoidscore = sigmoid(score);
 		std::vector< float > vecotor_product(dim);
 		std::vector< float > gradient(dim);
-		//std::cout << gradient.size() << std::endl;
 		for(int i=0;i<dim;i++){
 			vecotor_product[i] = vector2[i] * vector3[i];
-		}
-		for(int i=0;i<dim;i++){
 			gradient[i] = - std::exp(-score) * sigmoidscore * vecotor_product[i];
 		}
 		return gradient;
 	}
 
 	std::vector< float > updater(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+	//void updater(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
 		std::vector< float > gradient2(dim);
+		std::vector< float > vector(dim);
 		gradient2 = computgradient(vector1, vector2, vector3);
 		for(int i=0; i<dim; i++){
-			vector1[i] = vector1[i] - learning_rate * gradient2[i];
+			vector[i] = vector1[i] - learning_rate * gradient2[i];
+		}
+		return vector;
+	}
+
+	std::vector< float > negative_computgradient(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+		float score = scorefuntion(vector1, vector2, vector3);
+		float sigmoidscore = sigmoid(score);
+		std::vector< float > vecotor_product(dim);
+		std::vector< float > gradient(dim);
+		for(int i=0;i<dim;i++){
+			vecotor_product[i] = vector2[i] * vector3[i];
+			gradient[i] = sigmoidscore * vecotor_product[i];
+		}
+		return gradient;
+	}
+
+	std::vector< float > negative_updater(std::vector< float >& vector1, std::vector< float >& vector2, std::vector< float >& vector3){
+		std::vector< float > negative_gradient(dim);
+		std::vector< float > vector(dim);
+		negative_gradient = negative_computgradient(vector1, vector2, vector3);
+		for(int i=0; i<dim; i++){
+			vector[i] = vector1[i] - learning_rate * negative_gradient[i];
 			//std::cout << vector1[i];
 		}
-		return vector1;
+		return vector;
 	}
 
 
 
-	void train(void){
+
+	void train(const int& iter){
 		randominitialize(subject, data.entity_num);
 		randominitialize(object, data.entity_num);
 		randominitialize(relation, data.relation_num);
-		//std::cout << subject[0][0] << ' ';
 		float score;
 		float sigmoidscore;
-		for(int i=0; i<10; i++){
-			for (auto j: data.tripleID){
-				//std::cout << '[' << j[0] <<',' << j[1] << ',' << j[2] << ']';
-				//score = scorefuntion(subject[i[0]], object[i[1]],relation[i[2]]);
+		int random_sample = 5;
+		std::vector< float > a, b, c;
+		std::random_device rnd;     // 非決定的な乱数生成器を生成
+    		std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
+    		std::uniform_int_distribution<> rand(0, data.entity_num-1);
+		//std::vector<std::vector <int> >  random_subject = std::vector<std::vector<int>> (data.entity_num, std::vector<int>(random_sample));
+		//std::vector<std::vector <int> >  random_object = std::vector<std::vector<int>> (data.entity_num, std::vector<int>(random_sample));
+		std::vector<std::vector <int> > tripleID_all = std::vector<std::vector<int>> (data.tripleID.size(), std::vector<int>(3 + random_sample*2));
+		std::cout << tripleID_all.size() << std::endl;
+		std::cout << tripleID_all.front().size() << std::endl;
+		for(int i=0; i<data.tripleID.size(); i++){
+			for(int j=0; j < 3; j++){
+				tripleID_all[i][j] = data.tripleID[i][j];
+				//std::cout << tripleID_all[i][j] << std::endl;
+			}
+		}
+		for(int i=0; i<data.tripleID.size(); i++){
+			for(int j=3; j < 3 + random_sample ; j++){
+				tripleID_all[i][j] = rand(mt);
+				//std::cout << tripleID_all[i][j] << std::endl;
+			}
+		}
+		for(int i=0; i<data.tripleID.size(); i++){
+			for(int j=3+random_sample; j < 3 + 2 * random_sample ; j++){
+				tripleID_all[i][j] = rand(mt);
+			}
+		}
+
+
+		//for(int i=0; i<data.tripleID.size(); i++){
+		//	for(int j=0; j<3+random_sample*2; j++){
+		//		std::cout << tripleID_all[i][j] << ' ';
+		//	}
+		//	std::cout << std::endl;
+		//}
+		for(int i=0; i<iter; i++){
+			for (auto j: tripleID_all){
+				a = updater(subject[j[0]], object[j[2]], relation[j[1]]);
+				b = updater(object[j[2]], subject[j[0]], relation[j[1]]);
+				c = updater(relation[j[1]], subject[j[0]], object[j[1]]);
+				subject[j[0]] = a;
+				object[j[2]] = b;
+				relation[j[1]] = c;
 				score = scorefuntion(subject[j[0]], object[j[2]], relation[j[1]]);
 				sigmoidscore = sigmoid(score);
-				//std::cout << score;
-				//std::cout << sigmoidscore;
-				subject[j[0]]= updater(subject[j[0]], object[j[2]], relation[j[1]]);
-				object[j[2]]= updater(object[j[2]], subject[j[0]], relation[j[1]]);
-				relation[j[1]]= updater(relation[j[1]], subject[j[0]], object[j[1]]);
+				//std::cout << "score:" << score << std::endl;
+				//std::cout << "sigmoidscore:" << sigmoidscore << std::endl;
+
+				for(int k=3;k<3+random_sample;k++){
+					score = scorefuntion(subject[j[k]], object[j[2]], relation[j[1]]);
+					a = negative_updater(subject[j[k]], object[j[2]], relation[j[1]]);
+					b = negative_updater(object[j[2]], subject[j[k]], relation[j[1]]);
+					c = negative_updater(relation[j[1]], subject[j[k]], object[j[2]]);
+					subject[j[k]] = a;
+					object[j[2]] = b;
+					relation[j[1]] = c;
+					//score = scorefuntion(subject[x], object[j[2]], relation[j[1]]);
+					//sigmoidscore = sigmoid(score);
+					//std::cout << "sigmoidscore:" << sigmoidscore << std::endl;
+				}
+				for(int k=3+random_sample; k<3+random_sample*2; k++){
+					score = scorefuntion(subject[j[0]], object[j[k]], relation[j[1]]);
+					a = negative_updater(subject[j[0]], object[j[k]], relation[j[1]]);
+					b = negative_updater(object[j[k]], subject[j[0]], relation[j[1]]);
+					c = negative_updater(relation[j[1]], subject[j[0]], object[j[k]]);
+					subject[j[0]] = a;
+					object[j[k]] = b;
+					relation[j[1]] = c;
+					score = scorefuntion(subject[j[0]], object[j[k]], relation[j[1]]);
+					sigmoidscore = sigmoid(score);
+					std::cout << "sigmoidscore:" << sigmoidscore << std::endl;
+				}
 			}
-			std::cout << i << std::endl;
-			//std::cout << std::endl;
+			std::cout<< "---------" << i << "----------" << std::endl;
+
 		}
 
 	}
 };
-    //void initialive_vecotor(){
-    //    std::random_device rnd;     // ?????????????
-    //	std::mt19937 mt(rnd());     //  ???????????32??????????????
-    //	std::uniform_int_distribution<> rand100(0, 99);        // [0, 99] ???????
-    //	for (int i = 0; i < 20; ++i) {
-    //	    std::cout << rand100(mt) << "\n";
-    //}
 
-    //}
+//class test{
+//public:
+//		CP(const std::string& filename, const int& dimension){
+//
+//};
 
 
 
 int main(int argc, char *argv[]) {
-	/*
-	Data data;
-	data.load(argv[1]); 
-	for(int i=0; i<2; i++){
-	    for(int j=0; j<3;j++){
-	        std::cout << data.triple[i][j];
-	    }
-	std::cout << std::endl;
-	}
-	data.entitydict(data.triple);
-	data.relationdict(data.triple);
-	data.makeid(data.entity_map, data.relation_map, data.triple);
-	for(int i=0; i<2; i++){
-	    for(int j=0; j<3;j++){
-	        std::cout << data.tripleID[i][j];
-	    }
-	std::cout << std::endl;
-	}
-	*/
 
 	std::string filename = argv[1];
 	int dimension = atoi(argv[2]);
+	int iteration = atoi(argv[3]);
 	CP cp(filename, dimension);
-	cp.train();
-	/*
-	for(int i=0; i<2; i++){
-	    for(int j=0; j<3;j++){
-	        std::cout << cp.data.tripleID[i][j];
-	    }
-	std::cout << std::endl;
-	}
-	*/
+	cp.train(iteration);
 
 	return 0;
 }
