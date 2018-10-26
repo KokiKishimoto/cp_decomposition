@@ -102,9 +102,11 @@ public:
 		//	fs << std::endl; 
 		//}
 		//fs.close();
+		int triple_size = tripleID.size();
 
 		std::ofstream fout;
 		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
+		fout.write((char * ) &triple_size,sizeof(int));
 		for(int i=0; i<tripleID.size(); i++){
 			for(int j=0; j<tripleID.front().size(); j++){
 				fout.write(( char * ) &tripleID[i][j], sizeof( int ) );
@@ -277,18 +279,32 @@ public:
 
 
 	void write_model(const std::vector < std::vector < double > >& matrix, const std::string& filename){
-		std::fstream fs;
-		fs.open(filename, std::ios::out);
-		std::cout << "matrixsize:" << matrix.size() << std::endl;
-		fs << matrix.size() << std::endl;
-		fs << dim << std::endl;
+		//std::fstream fs;
+		//fs.open(filename, std::ios::out);
+		//std::cout << "matrixsize:" << matrix.size() << std::endl;
+		//fs << matrix.size() << std::endl;
+		//fs << dim << std::endl;
+		//for(int i=0; i<matrix.size(); i++){
+		//	for(int j=0; j<dim; j++){
+		//		fs << matrix[i][j] << ' ' << std::flush; 
+		//	}
+		//	fs << std::endl; 
+		//}
+		//fs.close();
+
+		int matrix_size = matrix.size();
+		std::ofstream fout;
+		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
+		fout.write((char * ) &matrix_size,sizeof(int));
+		fout.write((char * ) &dim,sizeof(int));
 		for(int i=0; i<matrix.size(); i++){
 			for(int j=0; j<dim; j++){
-				fs << matrix[i][j] << ' ' << std::flush; 
+				fout.write(( char * ) &matrix[i][j], sizeof( double ) );
+				//std::cout << matrix[i][j] << ' ';
 			}
-			fs << std::endl; 
+			//std::cout << std::endl;
 		}
-		fs.close();
+		fout.close();
 	}
 
 
