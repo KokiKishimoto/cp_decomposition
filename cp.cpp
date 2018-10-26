@@ -93,15 +93,25 @@ public:
 	}
 
 	void write_file(const std::vector < std::vector < int > >& tripleID, const std::string& filename){
-		std::fstream fs;
-		fs.open(filename, std::ios::out);
+		//std::fstream fs;
+		//fs.open(filename, std::ios::out);
+		//for(int i=0; i<tripleID.size(); i++){
+		//	for(int j=0; j<3; j++){
+		//		fs << tripleID[i][j] << ' ' << std::flush; 
+		//	}
+		//	fs << std::endl; 
+		//}
+		//fs.close();
+
+		std::ofstream fout;
+		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
 		for(int i=0; i<tripleID.size(); i++){
-			for(int j=0; j<3; j++){
-				fs << tripleID[i][j] << ' ' << std::flush; 
+			for(int j=0; j<tripleID.front().size(); j++){
+				fout.write(( char * ) &tripleID[i][j], sizeof( int ) );
 			}
-			fs << std::endl; 
 		}
-		fs.close();
+		fout.close();
+
 	}
 };
 

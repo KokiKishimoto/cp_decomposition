@@ -18,6 +18,7 @@ public:
 	std::vector< std::vector <float> > object;
 	std::vector< std::vector <float> > relation;
 	Test(const std::string& testid, const std::string& subjectname, const std::string& objectname, const std::string& relationname){
+		triple = std::vector<std::vector<int>>(3134, std::vector<int>(3));
 		load(testid);
 		model_load(subjectname, subject);
 		model_load(objectname, object);
@@ -25,11 +26,13 @@ public:
 	}
 
 	std::vector< std::vector <int> > load(const std::string& file_name){
+	//void load(const std::string& file_name){
+		/*
         	std::fstream fs;
 		std::vector<int> tmp(3);
 		int l,m,n;
 		fs.open(file_name, std::ios::in);
-		//if(! fs.is_open()) {
+		//if(! fs.is_open
 		//return EXIT_FAILURE;
 		//}
 		while (fs >> l >> m >> n){
@@ -42,9 +45,27 @@ public:
 		}
 		
 		fs.close(); 
-		return triple;
+		//return triple;
+		*/
+
+	int d;
+	//int x = 0;
+	//int y = 0;
+	std::ifstream fin(file_name, std::ios::in | std::ios::binary);
+	for(int i=0; i<3134; i++){
+		
+		for(int j=0; j<3; j++){
+			fin.read( ( char * ) &d, sizeof(int));
+			triple[i][j] = d;
+			//std::cout << triple[i][j] << ' ';
+		}
+		//std::cout << std::endl;
+			
 	}
-	
+	fin.close();
+	return triple;
+	}
+
 	void model_load(const std::string& file_name, std::vector< std::vector< float > >&matrix){
 		std::fstream fs;
 		std::string l,m,n;
@@ -52,17 +73,20 @@ public:
 		int dim;
 		fs.open(file_name, std::ios::in);
 		fs >> str >> dim;
-		//std::getline(fs, str); //? cin ( https://www.qoosky.io/techs/d5709e9878 ) ??????? fs
-		//std::getline(fs, dim); //? cin ( https://www.qoosky.io/techs/d5709e9878 ) ??????? fs
 		matrix = std::vector< std::vector< float > >(str, std::vector<float>(dim));
-		std::cout << str << std::endl; //=> 1 10 100	//}
+		//std::cout << matrix[0][0] << std::endl;
 		for(int i=0; i<str; i++){
 			for(int j=0; j<dim; j++){
 				fs >> matrix[i][j];
-				//std::cout << matrix[i][j] << ' ';
 			}
-			//std::cout << std::endl;
 		}
+
+		//for(int i=0; i<str; i++){
+		//	for(int j=0; j<dim; j++){
+		//		std::cout >> matrix[i][j] << std::endl;
+		//	}
+		//	//std::cout << std::endl;
+		//}
 		fs.close(); 
 		std::cout << "size:" << matrix.size() << std::endl;
 		std::cout << "frontsize:" << matrix.front().size() << std::endl;
