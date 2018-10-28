@@ -72,20 +72,49 @@ public:
 		return score;
 	}
 
+	//void srank(void){
+	//	int ranking;
+	//	int cnt = 0;
+	//	int all = subject.size();
+	//	double score_test;
+	//	double score;
+	//	for(auto x:triple){
+	//		ranking = 1;
+	//		score_test = 0;
+	//		score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
+	//		for(int i=0; i<subject.size(); i++){
+	//			score = 0;
+	//			score = scorefunction(subject[i], object[x[2]], relation[x[1]]);
+	//			if(score_test < score){
+	//				ranking = ranking + 1;
+	//			}
+	//		}
+	//		
+	//		if(ranking < 10){
+	//			cnt = cnt + 1;
+	//		}
+	//	}
+	//	std::cout << "cnt:" << cnt << std::endl;
+	//}
 	void srank(void){
 		int ranking;
 		int cnt = 0;
 		int all = subject.size();
+		int relation_number = 11;
 		double score_test;
+		double score_test2;
 		double score;
+		double score2;
 		for(auto x:triple){
 			ranking = 1;
 			score_test = 0;
+			score_test2 = 0;
 			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
+			score_test2 = scorefunction(object[x[2]], subject[x[0]], relation[x[1]+relation_number]);
 			for(int i=0; i<subject.size(); i++){
 				score = 0;
 				score = scorefunction(subject[i], object[x[2]], relation[x[1]]);
-				if(score_test < score){
+				if(score_test+score_test2 < score){
 					ranking = ranking + 1;
 				}
 			}
@@ -101,25 +130,28 @@ public:
 		int ranking;
 		int cnt = 0;
 		int all = subject.size();
+		int relation_number = 11;
 		double score_test;
 		double score_test2;
 		double score;
 		double score2;
+		double sum_score;
 		for(auto x:triple){
 			ranking = 1;
 			score_test = 0;
 			score_test2 = 0;
 			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
-			score_test2 = scorefunction(object[x[2]], subject[x[0]], relation[x[1]]);
+			score_test2 = scorefunction(object[x[2]], subject[x[0]], relation[x[1]+relation_number]);
+			sum_score = score_test + score_test2;
 			for(int i=0; i<subject.size(); i++){
 				score = 0;
 				score = scorefunction(subject[x[0]], object[i], relation[x[1]]);
-				if(score_test < score){
+				if(sum_score < score){
 					ranking = ranking + 1;
 				}
 			}
 			
-			if(ranking < 10){
+			if(ranking < 20){
 				cnt = cnt + 1;
 			}
 		}

@@ -1,0 +1,58 @@
+rate:0.025dafadfadfasfadf:_hypernym
+dafadfadfasfadf:_derivationally_related_form
+dafadfadfasfadf:_instance_hypernym
+dafadfadfasfadf:_also_see
+dafadfadfasfadf:_member_meronym
+dafadfadfasfadf:_synset_domain_topic_of
+dafadfadfasfadf:_has_part
+dafadfadfasfadf:_member_of_domain_usage
+dafadfadfasfadf:_member_of_domain_region
+dafadfadfasfadf:_verb_group
+dafadfadfasfadf:_similar_to
+keyyeeeeee = _also_see, vallllleeeee = 3
+keyyeeeeee = _derivationally_related_form, vallllleeeee = 1
+keyyeeeeee = _has_part, vallllleeeee = 6
+keyyeeeeee = _hypernym, vallllleeeee = 0
+keyyeeeeee = _instance_hypernym, vallllleeeee = 2
+keyyeeeeee = _member_meronym, vallllleeeee = 4
+keyyeeeeee = _member_of_domain_region, vallllleeeee = 8
+keyyeeeeee = _member_of_domain_usage, vallllleeeee = 7
+keyyeeeeee = _similar_to, vallllleeeee = 10
+keyyeeeeee = _synset_domain_topic_of, vallllleeeee = 5
+keyyeeeeee = _verb_group, vallllleeeee = 9
+saaaaaize22
+key:**_also_seevalue:14
+key:**_derivationally_related_formvalue:12
+key:**_has_partvalue:17
+key:**_hypernymvalue:11
+key:**_instance_hypernymvalue:13
+key:**_member_meronymvalue:15
+key:**_member_of_domain_regionvalue:19
+key:**_member_of_domain_usagevalue:18
+key:**_similar_tovalue:21
+key:**_synset_domain_topic_ofvalue:16
+key:**_verb_groupvalue:20
+key:_also_seevalue:3
+key:_derivationally_related_formvalue:1
+key:_has_partvalue:6
+key:_hypernymvalue:0
+key:_instance_hypernymvalue:2
+key:_member_meronymvalue:4
+key:_member_of_domain_regionvalue:8
+key:_member_of_domain_usagevalue:7
+key:_similar_tovalue:10
+key:_synset_domain_topic_ofvalue:5
+key:_verb_groupvalue:9
+entity_num:40559
+relation_num:11
+finish load
+finish makeid
+finish write_file
+finish randominitialize subject
+finish randominitialize object
+finish randominitialize relation
+173670
+3
+finish tripleID
+finish negativesubject
+finish negativeobject

@@ -19,6 +19,7 @@ public:
 	std::vector< std::vector < int > > tripleID;
 	int entity_num;
 	int relation_num;
+	int relation_numkari;
 	int relation_cnt;
 	Data(){}
 	std::vector< std::vector <std::string> > load(const std::string& file_name){
@@ -44,13 +45,17 @@ public:
 		int triplesize = triple.size();
 		for(int i=0; i<triplesize; i++){
 			tmp[0] = triple[i][2];
-			tmp[1] = std::to_string(relation_map[triple[i][1]]);
+			//tmp[1] = std::to_string(relation_map[triple[i][1]]);
+			tmp[1] = "**" + triple[i][1];
+			//std::cout << "tmppppp" << tmp[1] << std::endl;
 			tmp[2] = triple[i][0];
 
 			triple.push_back(tmp);
 
 		}
 	}
+
+
 	std::map<std::string, int> entitydict(std::vector< std::vector < std::string > >& triple){
 		int entity_cnt = 0;
 		for(int i=0; i<triple.size(); i++){
@@ -74,7 +79,25 @@ public:
 				relation_cnt++;
 			}
 		}
-		relation_num = relation_cnt;
+		relation_numkari = relation_cnt;
+		return relation_map;
+	}
+
+	std::map<std::string, int> rev_dict(){
+		int count = 0;
+		std::string revkey;
+		for(auto itr = relation_map.begin(); itr != relation_map.end(); ++itr) {
+        		std::cout << "keyyeeeeee = " << itr->first << ", vallllleeeee = " << itr->second << "\n";    // ????
+			revkey = "**" + itr->first;
+			relation_map[revkey] = itr->second + relation_numkari;
+    		}
+		for(auto itr = relation_map.begin(); itr != relation_map.end(); ++itr) {
+			count = count + 1;
+    		}
+		relation_num = count;
+		for(auto itr = relation_map.begin(); itr != relation_map.end(); ++itr) {
+        		std::cout << "keyyeeeeee = " << itr->first << ", vallllleeeee = " << itr->second << "\n";    // ????
+    		}
 		return relation_map;
 	}
 	std::vector< std::vector < int > > makeid(std::map<std::string, int>& entity_map, std::map<std::string, int>& relation_map, std::vector< std::vector < std::string > >& triple){
@@ -89,19 +112,13 @@ public:
 
 
 		}
+		//for(int i=85000; i<87000; i++){
+		//	std::cout << tripleID[i][0] << ' ' << tripleID[i][1] << ' ' << tripleID[i][2] << std::endl;
+		//}
 		return tripleID;
 	}
 
 	void write_file(const std::vector < std::vector < int > >& tripleID, const std::string& filename){
-		//std::fstream fs;
-		//fs.open(filename, std::ios::out);
-		//for(int i=0; i<tripleID.size(); i++){
-		//	for(int j=0; j<3; j++){
-		//		fs << tripleID[i][j] << ' ' << std::flush; 
-		//	}
-		//	fs << std::endl; 
-		//}
-		//fs.close();
 		int triple_size = tripleID.size();
 
 		std::ofstream fout;
@@ -140,12 +157,18 @@ public:
 		data.entitydict(data.triple);
 		data.relationdict(data.triple);
 		data.add_rev();
-		data.relationdict(data.triple);
+		data.rev_dict();
 		std::cout << "saaaaaize" << data.relation_map.size() << std::endl;
 		for(auto x:data.relation_map){
 			std::cout << "key:" << x.first << "value:" << x.second << std::endl;
 		}
 		data.makeid(data.entity_map, data.relation_map, data.triple);
+		//for(int i=0; i<4000; i++){
+		//	for(int j=0; j<3; j++){
+		//		std::cout << data.tripleID[i][j] << ' ';
+		//	}
+		//	std::cout << std::endl;
+		//}
 		std::cout << "entity_num:" << data.entity_num << std::endl;
 		std::cout << "relation_num:" << data.relation_num<< std::endl;
 		testdata.load(testname); 
@@ -190,7 +213,7 @@ public:
 		std::vector< double > gradient(dim);
 		for(int i=0;i<dim;i++){
 			vecotor_product[i] = vector2[i] * vector3[i];
-			gradient[i] = - std::exp(-score) * sigmoidscore * vecotor_product[i];
+			gradient[i] = - std::exp(-score) * sigmoidscore * vecotor_product[i];// + lam * vector1[i];
 		}
 		return gradient;
 	}
@@ -314,78 +337,91 @@ public:
 		std::cout << "finish randominitialize subject" << std::endl;
 		randominitialize(object, data.entity_num);
 		std::cout << "finish randominitialize object" << std::endl;
+		std::cout << "iyahhhhhhoooo" << data.relation_num << std::endl;
 		randominitialize(relation, data.relation_num);
 		std::cout << "finish randominitialize relation" << std::endl;
 		double score;
 		double sigmoidscore;
-		int random_sample = 5;
+		int random_sample = 2;
 		std::vector< double > a, b, c;
 		std::random_device rnd;     
     		std::mt19937 mt(rnd());     
     		std::uniform_int_distribution<> rand(0, data.entity_num-1);
-		std::vector<std::vector <int> > tripleID_all = std::vector<std::vector<int>> (data.tripleID.size(), std::vector<int>(3 + random_sample*2));
-		std::cout << tripleID_all.size() << std::endl;
-		std::cout << tripleID_all.front().size() << std::endl;
+		//std::vector<std::vector <int> > tripleID_all = std::vector<std::vector<int>> (data.tripleID.size(), std::vector<int>(3 + random_sample*2));
+		//std::cout << tripleID_all.size() << std::endl;
+		//std::cout << tripleID_all.front().size() << std::endl;
+		//for(int i=0; i<data.tripleID.size(); i++){
+		//	for(int j=0; j < 3; j++){
+		//		tripleID_all[i][j] = data.tripleID[i][j];
+		//	}
+		//}
+		//std::cout << "finish tripleID" << std::endl;
+		//for(int i=0; i<data.tripleID.size(); i++){
+		//	for(int j=3; j < 3 + random_sample ; j++){
+		//		tripleID_all[i][j] = rand(mt);
+		//	}
+		//}
+		//std::cout << "finish negativesubject" << std::endl;
+		//for(int i=0; i<data.tripleID.size(); i++){
+		//	for(int j=3+random_sample; j < 3 + 2 * random_sample ; j++){
+		//		tripleID_all[i][j] = rand(mt);
+		//	}
+		//}
+		//std::cout << "finish negativeobject" << std::endl;
+		std::vector<int> v = std::vector<int>(data.tripleID.size());
 		for(int i=0; i<data.tripleID.size(); i++){
-			for(int j=0; j < 3; j++){
-				tripleID_all[i][j] = data.tripleID[i][j];
-			}
+			v[i] = i;
 		}
-		std::cout << "finish tripleID" << std::endl;
-		for(int i=0; i<data.tripleID.size(); i++){
-			for(int j=3; j < 3 + random_sample ; j++){
-				tripleID_all[i][j] = rand(mt);
-			}
-		}
-		std::cout << "finish negativesubject" << std::endl;
-		for(int i=0; i<data.tripleID.size(); i++){
-			for(int j=3+random_sample; j < 3 + 2 * random_sample ; j++){
-				tripleID_all[i][j] = rand(mt);
-			}
-		}
-		std::cout << "finish negativeobject" << std::endl;
 
 		for(int i=0; i<iter; i++){
+			std::random_device seed_gen;
+			std::mt19937 engine(seed_gen());
+			std::shuffle(v.begin(), v.end(), engine);
 
-			int cnt = 0;
-			for (auto j: tripleID_all){
+			
+			int cnt = 1;
+			for (auto j: v){
+				//std::cout << j << std::endl;
+				int subject_elem = data.tripleID[j][0];
+				int object_elem = data.tripleID[j][2];
+				int relation_elem = data.tripleID[j][1];
 				if(cnt % 1000 == 0){
 					std::cout << cnt << ' ' << std::flush;
 				}
 				cnt++;
-				a = updater(subject[j[0]], object[j[2]], relation[j[1]]);
-				b = updater(object[j[2]], subject[j[0]], relation[j[1]]);
-				c = updater(relation[j[1]], subject[j[0]], object[j[2]]);
-				subject[j[0]] = a;
-				object[j[2]] = b;
-				relation[j[1]] = c;
+				a = updater(subject[subject_elem], object[object_elem], relation[relation_elem]);
+				b = updater(object[object_elem], subject[subject_elem], relation[relation_elem]);
+				c = updater(relation[relation_elem], subject[subject_elem], object[object_elem]);
+				subject[subject_elem] = a;
+				object[object_elem] = b;
+				relation[relation_elem] = c;
 
 				for(int k=0;k<random_sample;k++){
 					random_num = rand(mt);
-					a = negative_updater(subject[random_num], object[j[2]], relation[j[1]]);
-					b = negative_updater(object[j[2]], subject[random_num], relation[j[1]]);
-					c = negative_updater(relation[j[1]], subject[random_num], object[j[2]]);
+					a = negative_updater(subject[random_num], object[object_elem], relation[relation_elem]);
+					b = negative_updater(object[object_elem], subject[random_num], relation[relation_elem]);
+					c = negative_updater(relation[relation_elem], subject[random_num], object[object_elem]);
 
 					subject[random_num] = a;
-					object[j[2]] = b;
-					relation[j[1]] = c;
+					object[object_elem] = b;
+					relation[relation_elem] = c;
 				}
-				for(int k=random_sample; k<random_sample; k++){
+				for(int k=0; k<random_sample; k++){
 					random_num = rand(mt);
-					a = negative_updater(subject[j[0]], object[random_num], relation[j[1]]);
-					b = negative_updater(object[random_num], subject[j[0]], relation[j[1]]);
-					c = negative_updater(relation[j[1]], subject[j[0]], object[random_num]);
-					subject[j[0]] = a;
+					a = negative_updater(subject[subject_elem], object[random_num], relation[relation_elem]);
+					b = negative_updater(object[random_num], subject[subject_elem], relation[relation_elem]);
+					c = negative_updater(relation[relation_elem], subject[subject_elem], object[random_num]);
+					subject[subject_elem] = a;
 					object[random_num] = b;
-					relation[j[1]] = c;
-					score = scorefuntion(subject[j[0]], object[random_num], relation[j[1]]);
+					relation[relation_elem] = c;
+					//score = scorefuntion(subject[subject_elem], object[random_num], relation[relation_elem]);
 				}
 			}
 			std::cout << std::endl;
 			std::cout << "---------------" << std::endl;;
 			std::cout << "---------------" << std::endl;;
 			std::cout<< "---------" << i << "----------" << std::endl;
-			std::cout << "scorreeeee:" << scorefuntion(subject[tripleID_all[0][0]], object[tripleID_all[0][2]], relation[tripleID_all[0][1]]) << std::endl;
+			std::cout << "scorreeeee:" << scorefuntion(subject[data.tripleID[0][0]], object[data.tripleID[0][2]], relation[data.tripleID[0][1]]) << std::endl;
 			std::cout << "---------------" << std::endl;;
 			std::cout << "---------------" << std::endl;;
 			if(i % 10 ==0){
@@ -395,7 +431,6 @@ public:
 				write_model(subject, subject_name);
 				write_model(object, object_name);
 				write_model(relation, relation_name);
-
 			}
 
 		}
