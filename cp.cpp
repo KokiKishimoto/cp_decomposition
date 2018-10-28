@@ -302,19 +302,6 @@ public:
 
 
 	void write_model(const std::vector < std::vector < double > >& matrix, const std::string& filename){
-		//std::fstream fs;
-		//fs.open(filename, std::ios::out);
-		//std::cout << "matrixsize:" << matrix.size() << std::endl;
-		//fs << matrix.size() << std::endl;
-		//fs << dim << std::endl;
-		//for(int i=0; i<matrix.size(); i++){
-		//	for(int j=0; j<dim; j++){
-		//		fs << matrix[i][j] << ' ' << std::flush; 
-		//	}
-		//	fs << std::endl; 
-		//}
-		//fs.close();
-
 		int matrix_size = matrix.size();
 		std::ofstream fout;
 		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
@@ -347,27 +334,6 @@ public:
 		std::random_device rnd;     
     		std::mt19937 mt(rnd());     
     		std::uniform_int_distribution<> rand(0, data.entity_num-1);
-		//std::vector<std::vector <int> > tripleID_all = std::vector<std::vector<int>> (data.tripleID.size(), std::vector<int>(3 + random_sample*2));
-		//std::cout << tripleID_all.size() << std::endl;
-		//std::cout << tripleID_all.front().size() << std::endl;
-		//for(int i=0; i<data.tripleID.size(); i++){
-		//	for(int j=0; j < 3; j++){
-		//		tripleID_all[i][j] = data.tripleID[i][j];
-		//	}
-		//}
-		//std::cout << "finish tripleID" << std::endl;
-		//for(int i=0; i<data.tripleID.size(); i++){
-		//	for(int j=3; j < 3 + random_sample ; j++){
-		//		tripleID_all[i][j] = rand(mt);
-		//	}
-		//}
-		//std::cout << "finish negativesubject" << std::endl;
-		//for(int i=0; i<data.tripleID.size(); i++){
-		//	for(int j=3+random_sample; j < 3 + 2 * random_sample ; j++){
-		//		tripleID_all[i][j] = rand(mt);
-		//	}
-		//}
-		//std::cout << "finish negativeobject" << std::endl;
 		std::vector<int> v = std::vector<int>(data.tripleID.size());
 		for(int i=0; i<data.tripleID.size(); i++){
 			v[i] = i;
@@ -401,12 +367,10 @@ public:
 					a = negative_updater(subject[random_num], object[object_elem], relation[relation_elem]);
 					b = negative_updater(object[object_elem], subject[random_num], relation[relation_elem]);
 					c = negative_updater(relation[relation_elem], subject[random_num], object[object_elem]);
-
 					subject[random_num] = a;
 					object[object_elem] = b;
 					relation[relation_elem] = c;
-				}
-				for(int k=0; k<random_sample; k++){
+
 					random_num = rand(mt);
 					a = negative_updater(subject[subject_elem], object[random_num], relation[relation_elem]);
 					b = negative_updater(object[random_num], subject[subject_elem], relation[relation_elem]);
@@ -424,13 +388,16 @@ public:
 			std::cout << "scorreeeee:" << scorefuntion(subject[data.tripleID[0][0]], object[data.tripleID[0][2]], relation[data.tripleID[0][1]]) << std::endl;
 			std::cout << "---------------" << std::endl;;
 			std::cout << "---------------" << std::endl;;
-			if(i % 10 ==0){
+			if(i % 30 ==0){
 				std::string subject_name = "./model/" + std::to_string(i) + "_subject.txt";
 				std::string object_name = "./model/" + std::to_string(i) + "_object.txt";
 				std::string relation_name = "./model/" + std::to_string(i) + "_relation.txt";
 				write_model(subject, subject_name);
 				write_model(object, object_name);
 				write_model(relation, relation_name);
+				for(int x=0; x<data.tripleID.size(); x++){
+					std::cout << scorefuntion(subject[data.tripleID[x][0]], object[data.tripleID[x][2]], relation[data.tripleID[x][1]]) << std::endl;
+				}
 			}
 
 		}
