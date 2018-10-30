@@ -31,12 +31,15 @@ public:
 	int triple_size;
 	std::ifstream fin(file_name, std::ios::in | std::ios::binary);
 	fin.read( ( char * ) &triple_size, sizeof(int));
+	std::cout << "tripleeeeeeeeeeesizeeeeeeeeeeeeee:" << triple_size << std::endl;
 	for(int i=0; i<2000; i++){
 		
 		for(int j=0; j<3; j++){
 			fin.read( ( char * ) &d, sizeof(int));
 			triple[i][j] = d;
+			std::cout << triple[i][j] << ' ';
 		}
+		std::cout << std::endl;
 			
 	}
 	fin.close();

@@ -77,7 +77,7 @@ public:
 				relation_cnt++;
 			}
 		}
-		relation_numkari = relation_cnt;
+		relation_num = relation_cnt;
 		return relation_map;
 	}
 
@@ -152,10 +152,10 @@ public:
 		learning_rate = rate;
 		std::cout << "rate:" << learning_rate;
 		data.load(filename); 
+		data.add_rev();
 		data.entitydict(data.triple);
 		data.relationdict(data.triple);
-		data.add_rev();
-		data.rev_dict();
+		//data.rev_dict();
 		std::cout << "saaaaaize" << data.relation_map.size() << std::endl;
 		for(auto x:data.relation_map){
 			std::cout << "key:" << x.first << "value:" << x.second << std::endl;
@@ -207,10 +207,10 @@ public:
 	}
 
 
-	double sigmoid(double& score){
-			double sigmoid;
-			sigmoid = 1 / (1 + std::exp(-score));
-			return sigmoid;
+	double sigmoid(double score){
+		double sigmoid;
+		sigmoid = 1 / (1 + std::exp(-score));
+		return sigmoid;
 	}
 
 	std::vector< double > computgradient(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
@@ -242,6 +242,36 @@ public:
 		}
 		return vector;
 	}
+
+	//std::vector< double > computgradient(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
+	//	double score = scorefuntion(vector1, vector2, vector3);
+	//	double yscore = y * score;
+	//	std::vector< double > vecotor_product(dim);
+	//	std::vector< double > gradient(dim);
+	//	for(int i=0;i<dim;i++){
+	//		gradient[i] = - y * sigmoid(-yscore) * vector2[i] * vector3[i];// + lam * vector1[i];
+	//	}
+	//	return gradient;
+	//}
+	//void updater(std::vector< int >& triple, int y){
+	//	std::vector< double > gradient(dim);
+	//	std::vector< double > vector(dim);
+	//	gradient = computgradient(vector1, vector2, vector3, y);
+	//	double norm = normfunction(gradient);
+	//	double threshold = 5;
+	//	for(int i=0; i<dim; i++){
+	//		if(norm >= threshold){
+	//			double x = threshold / norm;
+	//			vector[i] = vector1[i] - x * learning_rate * gradient[i];
+	//		}else{
+	//			vector[i] = vector1[i] - learning_rate * gradient[i];
+	//			
+	//		}
+
+	//	}
+	//	return vector;
+	//}
+
 	double normfunction(std::vector< double >& vector){
 		double norm = 0.0;
 		for(int i=0; i<vector.size(); i++){
