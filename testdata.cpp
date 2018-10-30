@@ -31,7 +31,7 @@ public:
 	int triple_size;
 	std::ifstream fin(file_name, std::ios::in | std::ios::binary);
 	fin.read( ( char * ) &triple_size, sizeof(int));
-	for(int i=0; i<3134; i++){
+	for(int i=0; i<2000; i++){
 		
 		for(int j=0; j<3; j++){
 			fin.read( ( char * ) &d, sizeof(int));
@@ -124,6 +124,7 @@ public:
 			}
 		}
 		std::cout << "cnt:" << cnt << std::endl;
+		std::cout << "test triple number:" << triple.size() << std::endl;
 	}
 
 	void orank(void){
