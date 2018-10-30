@@ -103,19 +103,16 @@ public:
 		int ranking;
 		int cnt = 0;
 		int all = subject.size();
-		int relation_number = 11;
+		int relation_number = relation.size() / 2;
 		double score_test;
 		double score_test2;
 		double score;
 		double score2;
 		for(auto x:triple){
 			ranking = 1;
-			score_test = 0;
-			score_test2 = 0;
 			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
-			score_test2 = scorefunction(object[x[2]], subject[x[0]], relation[x[1]+relation_number]);
+			score_test2 = scorefunction(subject[x[2]], object[x[0]], relation[x[1]+relation_number]);
 			for(int i=0; i<subject.size(); i++){
-				score = 0;
 				score = scorefunction(subject[i], object[x[2]], relation[x[1]]);
 				if(score_test+score_test2 < score){
 					ranking = ranking + 1;
@@ -134,7 +131,7 @@ public:
 		int ranking;
 		int cnt = 0;
 		int all = subject.size();
-		int relation_number = 11;
+		int relation_number = relation.size() / 2;
 		double score_test;
 		double score_test2;
 		double score;
@@ -142,13 +139,10 @@ public:
 		double sum_score;
 		for(auto x:triple){
 			ranking = 1;
-			score_test = 0;
-			score_test2 = 0;
 			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
-			score_test2 = scorefunction(object[x[2]], subject[x[0]], relation[x[1]+relation_number]);
+			score_test2 = scorefunction(subject[x[2]], object[x[0]], relation[x[1]+relation_number]);
 			sum_score = score_test + score_test2;
 			for(int i=0; i<subject.size(); i++){
-				score = 0;
 				score = scorefunction(subject[x[0]], object[i], relation[x[1]]);
 				if(sum_score < score){
 					ranking = ranking + 1;
@@ -161,13 +155,6 @@ public:
 		}
 		std::cout << "cnt:" << cnt << std::endl;
 	}
-
-	double sigmoid(double& score){
-		double sigmoid;
-		sigmoid = 1 / (1 + std::exp(-score));
-		return sigmoid;
-	}
-
 };
 int main(int argc, char *argv[]){
 	std::string testid = argv[1];
