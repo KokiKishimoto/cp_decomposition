@@ -179,23 +179,7 @@ public:
 		std::cout << "entity_num:" << data.entity_num << std::endl;
 	}
 		
-	//void randominitialize(std::vector< std::vector< double > >& matrix, const int&size){
-	//	matrix = std::vector<std::vector<double>> (size, std::vector<double>(dim));
-	//	std::random_device rnd;     
-    	//	std::mt19937 mt(rnd());     
-    	//	std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*dim), sqrt(6)/sqrt(2*dim));
-	//	for(int i=0;i<size;i++){
-	//		for(int j=0;j<dim;j++){
-	//			matrix[i][j] = rand100(mt);
-	//		}
-	//	}
-
-	//}
-
 	void randominitialize(const int&entity_size, const int&relation_size){
-		//subject = std::vector<std::vector<double>> (entity_size, std::vector<double>(dim));
-		//object = std::vector<std::vector<double>> (entity_size, std::vector<double>(dim));
-		//relation = std::vector<std::vector<double>> (relation_size, std::vector<double>(dim));
 		std::random_device rnd;     
     		std::mt19937 mt(rnd());     
     		std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*dim), sqrt(6)/sqrt(2*dim));
@@ -231,46 +215,27 @@ public:
 
 	std::vector< double > computgradient(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
 		double score = scorefuntion(vector1, vector2, vector3);
-		double yscore = -y * score;
+		double yscore = y * score;
 		std::vector< double > vecotor_product(dim);
 		std::vector< double > gradient(dim);
 		for(int i=0;i<dim;i++){
-			gradient[i] = - y * sigmoid(yscore) * vector2[i] * vector3[i];// + lam * vector1[i];
+			gradient[i] = - y * sigmoid(-yscore) * vector2[i] * vector3[i];// + lam * vector1[i];
 		}
 		return gradient;
 	}
 
-	//std::vector< double > updater(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
-	//	std::vector< double > gradient2(dim);
-	//	std::vector< double > vector(dim);
-	//	gradient2 = computgradient(vector1, vector2, vector3, y);
-	//	double norm = normfunction(gradient2);
-	//	double threshold = 5;
-	//	for(int i=0; i<dim; i++){
-	//		if(norm >= threshold){
-	//			double x = threshold / norm;
-	//			vector[i] = vector1[i] - x * learning_rate * gradient2[i];
-	//		}else{
-	//			vector[i] = vector1[i] - learning_rate * gradient2[i];
-	//			
-	//		}
-
-	//	}
-	//	return vector;
-	//}
-
 	std::vector< double > updater(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
-		std::vector< double > gradient2(dim);
+		std::vector< double > gradient(dim);
 		std::vector< double > vector(dim);
-		gradient2 = computgradient(vector1, vector2, vector3, y);
-		double norm = normfunction(gradient2);
+		gradient = computgradient(vector1, vector2, vector3, y);
+		double norm = normfunction(gradient);
 		double threshold = 5;
 		for(int i=0; i<dim; i++){
 			if(norm >= threshold){
 				double x = threshold / norm;
-				vector[i] = vector1[i] - x * learning_rate * gradient2[i];
+				vector[i] = vector1[i] - x * learning_rate * gradient[i];
 			}else{
-				vector[i] = vector1[i] - learning_rate * gradient2[i];
+				vector[i] = vector1[i] - learning_rate * gradient[i];
 				
 			}
 
@@ -278,7 +243,7 @@ public:
 		return vector;
 	}
 	double normfunction(std::vector< double >& vector){
-		double norm;
+		double norm = 0.0;
 		for(int i=0; i<vector.size(); i++){
 			norm = norm + std::pow(vector[i], 2.0);
 		}
