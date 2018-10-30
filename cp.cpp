@@ -45,9 +45,7 @@ public:
 		int triplesize = triple.size();
 		for(int i=0; i<triplesize; i++){
 			tmp[0] = triple[i][2];
-			//tmp[1] = std::to_string(relation_map[triple[i][1]]);
 			tmp[1] = "**" + triple[i][1];
-			//std::cout << "tmppppp" << tmp[1] << std::endl;
 			tmp[2] = triple[i][0];
 
 			triple.push_back(tmp);
@@ -117,9 +115,6 @@ public:
 
 
 		}
-		//for(int i=85000; i<87000; i++){
-		//	std::cout << tripleID[i][0] << ' ' << tripleID[i][1] << ' ' << tripleID[i][2] << std::endl;
-		//}
 		return tripleID;
 	}
 
@@ -147,7 +142,6 @@ public:
 	std::vector< std::vector <double> > relation;
 	std::vector< std::vector <double> > object;
 	int dim;
-	//double objective_f;
 	double learning_rate;
 	double lam;
 	Data data;
@@ -175,20 +169,51 @@ public:
 		std::cout << "finish makeid" << std::endl;
 		testdata.write_file(testdata.tripleID, testidname);
 		std::cout << "finish write_file" << std::endl;
+
+		subject = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
+		object = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
+		relation = std::vector<std::vector<double>> (data.relation_num, std::vector<double>(dim));
+		std::cout << "sub:" << subject.size() << std::endl;
+		std::cout << "obj:" << object.size() << std::endl;
+		std::cout << "rel:" << relation.size() << std::endl;
+		std::cout << "entity_num:" << data.entity_num << std::endl;
 	}
 		
-	void randominitialize(std::vector< std::vector< double > >& matrix, const int&size){
-		matrix = std::vector<std::vector<double>> (size, std::vector<double>(dim));
+	//void randominitialize(std::vector< std::vector< double > >& matrix, const int&size){
+	//	matrix = std::vector<std::vector<double>> (size, std::vector<double>(dim));
+	//	std::random_device rnd;     
+    	//	std::mt19937 mt(rnd());     
+    	//	std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*dim), sqrt(6)/sqrt(2*dim));
+	//	for(int i=0;i<size;i++){
+	//		for(int j=0;j<dim;j++){
+	//			matrix[i][j] = rand100(mt);
+	//		}
+	//	}
+
+	//}
+
+	void randominitialize(const int&entity_size, const int&relation_size){
+		//subject = std::vector<std::vector<double>> (entity_size, std::vector<double>(dim));
+		//object = std::vector<std::vector<double>> (entity_size, std::vector<double>(dim));
+		//relation = std::vector<std::vector<double>> (relation_size, std::vector<double>(dim));
 		std::random_device rnd;     
     		std::mt19937 mt(rnd());     
     		std::uniform_real_distribution<> rand100(-sqrt(6)/sqrt(2*dim), sqrt(6)/sqrt(2*dim));
-		for(int i=0;i<size;i++){
+		for(int i=0;i<entity_size;i++){
 			for(int j=0;j<dim;j++){
-				matrix[i][j] = rand100(mt);
+				subject[i][j] = rand100(mt);
+				object[i][j] = rand100(mt);
+			}
+		}
+
+		for(int i=0;i<relation_size;i++){
+			for(int j=0;j<dim;j++){
+				relation[i][j] = rand100(mt);
 			}
 		}
 
 	}
+
 	double scorefuntion(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3){
 		double score = 0;
 		for (int i=0;i<dim;i++){
@@ -215,6 +240,25 @@ public:
 		return gradient;
 	}
 
+	//std::vector< double > updater(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
+	//	std::vector< double > gradient2(dim);
+	//	std::vector< double > vector(dim);
+	//	gradient2 = computgradient(vector1, vector2, vector3, y);
+	//	double norm = normfunction(gradient2);
+	//	double threshold = 5;
+	//	for(int i=0; i<dim; i++){
+	//		if(norm >= threshold){
+	//			double x = threshold / norm;
+	//			vector[i] = vector1[i] - x * learning_rate * gradient2[i];
+	//		}else{
+	//			vector[i] = vector1[i] - learning_rate * gradient2[i];
+	//			
+	//		}
+
+	//	}
+	//	return vector;
+	//}
+
 	std::vector< double > updater(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
 		std::vector< double > gradient2(dim);
 		std::vector< double > vector(dim);
@@ -233,7 +277,6 @@ public:
 		}
 		return vector;
 	}
-
 	double normfunction(std::vector< double >& vector){
 		double norm;
 		for(int i=0; i<vector.size(); i++){
@@ -261,15 +304,8 @@ public:
 
 	void train(const int& iter){
 		int random_num;
-		randominitialize(subject, data.entity_num);
-		std::cout << "finish randominitialize subject" << std::endl;
-		randominitialize(object, data.entity_num);
-		std::cout << "finish randominitialize object" << std::endl;
-		std::cout << "iyahhhhhhoooo" << data.relation_num << std::endl;
-		randominitialize(relation, data.relation_num);
+		randominitialize(data.entity_num, data.relation_num);
 		std::cout << "finish randominitialize relation" << std::endl;
-		//double score;
-		//double sigmoidscore;
 		int random_sample = 2;
 		std::vector< double > a, b, c;
 		std::random_device rnd;     
@@ -288,7 +324,6 @@ public:
 			
 			int cnt = 1;
 			for (auto j: v){
-				//std::cout << j << std::endl;
 				int subject_elem = data.tripleID[j][0];
 				int object_elem = data.tripleID[j][2];
 				int relation_elem = data.tripleID[j][1];
