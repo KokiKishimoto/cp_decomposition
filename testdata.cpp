@@ -17,8 +17,8 @@ public:
 	std::vector< std::vector <double> > subject;
 	std::vector< std::vector <double> > object;
 	std::vector< std::vector <double> > relation;
+	int triple_size;
 	Test(const std::string& testid, const std::string& subjectname, const std::string& objectname, const std::string& relationname){
-		triple = std::vector<std::vector<int>>(3134, std::vector<int>(3));
 		load(testid);
 		model_load(subjectname, subject);
 		model_load(objectname, object);
@@ -28,18 +28,18 @@ public:
 	std::vector< std::vector <int> > load(const std::string& file_name){
 
 	int d;
-	int triple_size;
 	std::ifstream fin(file_name, std::ios::in | std::ios::binary);
 	fin.read( ( char * ) &triple_size, sizeof(int));
 	std::cout << "tripleeeeeeeeeeesizeeeeeeeeeeeeee:" << triple_size << std::endl;
-	for(int i=0; i<2000; i++){
+	triple = std::vector<std::vector<int>>(triple_size, std::vector<int>(3));
+	for(int i=0; i<triple_size; i++){
 		
 		for(int j=0; j<3; j++){
 			fin.read( ( char * ) &d, sizeof(int));
 			triple[i][j] = d;
-			std::cout << triple[i][j] << ' ';
+			//std::cout << triple[i][j] << ' ';
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 			
 	}
 	fin.close();
@@ -108,6 +108,7 @@ public:
 		double score_test2;
 		double score;
 		double score2;
+		double rate;
 		for(auto x:triple){
 			ranking = 1;
 			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
@@ -119,12 +120,14 @@ public:
 				}
 			}
 			
-			if(ranking < 10){
+			if(ranking < 2){
 				cnt = cnt + 1;
 			}
 		}
+		rate = (float)cnt / (float)triple_size;
 		std::cout << "cnt:" << cnt << std::endl;
-		std::cout << "test triple number:" << triple.size() << std::endl;
+		std::cout << "test triple number:" << triple_size << std::endl;
+		std::cout << "rate:" << rate << std::endl;
 	}
 
 	void orank(void){
@@ -149,7 +152,7 @@ public:
 				}
 			}
 			
-			if(ranking < 20){
+			if(ranking < 10){
 				cnt = cnt + 1;
 			}
 		}

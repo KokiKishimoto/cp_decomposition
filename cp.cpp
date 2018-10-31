@@ -132,6 +132,7 @@ public:
 		fout.close();
 
 	}
+
 };
 
 
@@ -141,11 +142,15 @@ public:
 	std::vector< std::vector <double> > subject;
 	std::vector< std::vector <double> > relation;
 	std::vector< std::vector <double> > object;
+	std::vector< std::vector <double> > normalize_subject;
+	std::vector< std::vector <double> > normalize_object;
+	std::vector< std::vector <double> > normalize_relation;
 	int dim;
 	double learning_rate;
 	double lam;
 	Data data;
 	Data testdata;
+	Data validdata;
 	CP(const std::string& filename, const std::string& testname, const int& dimension, const std::string& testidname, const double& rate, const double& lambda){
 		dim= dimension;
 		lam = lambda;
@@ -164,20 +169,23 @@ public:
 		std::cout << "entity_num:" << data.entity_num << std::endl;
 		std::cout << "relation_num:" << data.relation_num<< std::endl;
 		testdata.load(testname); 
-		std::cout << "finish load" << std::endl;
 		testdata.makeid(data.entity_map, data.relation_map, testdata.triple);
-		std::cout << "finish makeid" << std::endl;
 		testdata.write_file(testdata.tripleID, testidname);
-		std::cout << "finish write_file" << std::endl;
+		//validdata.load(validname);
+		//validdata.makeid(data.entity_map, data.relation_map, validdata.triple);
 
 		subject = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
 		object = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
 		relation = std::vector<std::vector<double>> (data.relation_num, std::vector<double>(dim));
+		normalize_subject = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
+		normalize_object = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
+		normalize_relation = std::vector<std::vector<double>> (data.relation_num, std::vector<double>(dim));
 		std::cout << "sub:" << subject.size() << std::endl;
 		std::cout << "obj:" << object.size() << std::endl;
 		std::cout << "rel:" << relation.size() << std::endl;
 		std::cout << "entity_num:" << data.entity_num << std::endl;
 	}
+
 		
 	void randominitialize(const int&entity_size, const int&relation_size){
 		std::random_device rnd;     
@@ -213,64 +221,76 @@ public:
 		return sigmoid;
 	}
 
-	std::vector< double > computgradient(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
-		double score = scorefuntion(vector1, vector2, vector3);
-		double yscore = y * score;
-		std::vector< double > vecotor_product(dim);
-		std::vector< double > gradient(dim);
-		for(int i=0;i<dim;i++){
-			gradient[i] = - y * sigmoid(-yscore) * vector2[i] * vector3[i];// + lam * vector1[i];
-		}
-		return gradient;
-	}
-
-	std::vector< double > updater(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
-		std::vector< double > gradient(dim);
+	std::vector< double > product(std::vector< double > vector1, std::vector< double > vector2){
 		std::vector< double > vector(dim);
-		gradient = computgradient(vector1, vector2, vector3, y);
-		double norm = normfunction(gradient);
-		double threshold = 5;
 		for(int i=0; i<dim; i++){
-			if(norm >= threshold){
-				double x = threshold / norm;
-				vector[i] = vector1[i] - x * learning_rate * gradient[i];
-			}else{
-				vector[i] = vector1[i] - learning_rate * gradient[i];
-				
-			}
-
+			vector[i] = vector1[i] * vector2[i];
 		}
 		return vector;
 	}
 
-	//std::vector< double > computgradient(std::vector< double >& vector1, std::vector< double >& vector2, std::vector< double >& vector3, int y){
-	//	double score = scorefuntion(vector1, vector2, vector3);
-	//	double yscore = y * score;
-	//	std::vector< double > vecotor_product(dim);
-	//	std::vector< double > gradient(dim);
-	//	for(int i=0;i<dim;i++){
-	//		gradient[i] = - y * sigmoid(-yscore) * vector2[i] * vector3[i];// + lam * vector1[i];
-	//	}
-	//	return gradient;
-	//}
-	//void updater(std::vector< int >& triple, int y){
-	//	std::vector< double > gradient(dim);
-	//	std::vector< double > vector(dim);
-	//	gradient = computgradient(vector1, vector2, vector3, y);
-	//	double norm = normfunction(gradient);
-	//	double threshold = 5;
-	//	for(int i=0; i<dim; i++){
-	//		if(norm >= threshold){
-	//			double x = threshold / norm;
-	//			vector[i] = vector1[i] - x * learning_rate * gradient[i];
-	//		}else{
-	//			vector[i] = vector1[i] - learning_rate * gradient[i];
-	//			
-	//		}
+	double innerproduct(std::vector< double > vector1, std::vector<double> vector2){
+		double score = 0;
+		for(int i=0; i<dim; i++){
+			score += vector1[i] * vector2[i];
+		}
+		return score;
+	}
+			
 
-	//	}
-	//	return vector;
-	//}
+	void updater(const int& subject_elem, const int& object_elem, const int& relation_elem, int y){
+		std::vector< double >  outvec1(dim);
+		std::vector< double >  outvec2(dim);
+		std::vector< double >  outvec3(dim);
+		std::vector< double >  s_gradient(dim);
+		std::vector< double >  o_gradient(dim);
+		std::vector< double >  r_gradient(dim);
+		double yscore;
+		double score = 0;
+		double norm_sub;
+		double norm_rel;
+		double norm_obj;
+		double threshold = 5;
+		outvec1 = product(object[object_elem], relation[relation_elem]);
+		outvec2 = product(subject[subject_elem], relation[relation_elem]);
+		outvec3 = product(subject[subject_elem], object[object_elem]);
+		score = innerproduct(subject[subject_elem], outvec1);
+		yscore = y * score;
+		for(int i=0; i<dim; i++){
+			s_gradient[i] = - y * sigmoid(-yscore) * outvec1[i];
+			o_gradient[i] = - y * sigmoid(-yscore) * outvec2[i];
+			r_gradient[i] = - y * sigmoid(-yscore) * outvec3[i];
+		} 
+		norm_sub = normfunction(s_gradient);
+		norm_obj = normfunction(o_gradient);
+		norm_rel = normfunction(r_gradient);
+		for(int i=0; i<dim; i++){
+			if(norm_sub >= threshold){
+				double x = threshold / norm_sub;
+				subject[subject_elem][i] = subject[subject_elem][i] - x * learning_rate * s_gradient[i];
+			}else{
+				subject[subject_elem][i] = subject[subject_elem][i] - learning_rate * s_gradient[i];
+				
+			}
+			if(norm_obj >= threshold){
+				double x = threshold / norm_obj;
+				object[object_elem][i] = object[object_elem][i] - x * learning_rate * o_gradient[i];
+			}else{
+				object[object_elem][i] = object[object_elem][i] - learning_rate * o_gradient[i];
+				
+			}
+			if(norm_rel >= threshold){
+				double x = threshold / norm_rel;
+				relation[relation_elem][i] = relation[relation_elem][i] - x * learning_rate * r_gradient[i];
+			}else{
+				relation[relation_elem][i] = relation[relation_elem][i] - learning_rate * r_gradient[i];
+				
+			}
+
+		}
+		
+	}
+
 
 	double normfunction(std::vector< double >& vector){
 		double norm = 0.0;
@@ -295,13 +315,39 @@ public:
 		}
 		fout.close();
 	}
+	void normalize_vector(void){
+		double norm_subject = 0; 
+		double norm_object = 0; 
+		double norm_relation = 0; 
+
+		for(int i=0; i<subject.size(); i++){
+			norm_subject = normfunction(subject[i]);
+			norm_object = normfunction(object[i]);
+			//std::cout << "subject[i]norm:" << normfunction(subject[i]);
+			for(int j=0; j<dim; j++){
+				normalize_subject[i][j] = subject[i][j]  / normfunction(subject[i]);
+				normalize_object[i][j] = object[i][j] / normfunction(object[i]);
+				//std::cout << "subject_ij " << subject[i][j] << ' ';
+				//std::cout << "norm_subject_ij " << normalize_subject[i][j] << ' ';
+			}
+			//std::cout << std::endl;
+		}
+
+		for(int i=0; i<relation.size(); i++){
+			norm_relation= normfunction(relation[i]);
+			for(int j=0; j<dim; j++){
+				normalize_relation[i][j] = relation[i][j] / normfunction(relation[i]);
+			}
+		}
+
+	}
 
 
 	void train(const int& iter){
 		int random_num;
 		randominitialize(data.entity_num, data.relation_num);
 		std::cout << "finish randominitialize relation" << std::endl;
-		int random_sample = 2;
+		int random_sample = 5;
 		std::vector< double > a, b, c;
 		std::random_device rnd;     
     		std::mt19937 mt(rnd());     
@@ -310,12 +356,10 @@ public:
 		for(int i=0; i<data.tripleID.size(); i++){
 			v[i] = i;
 		}
-
 		for(int i=0; i<iter; i++){
 			std::random_device seed_gen;
 			std::mt19937 engine(seed_gen());
 			std::shuffle(v.begin(), v.end(), engine);
-
 			
 			int cnt = 1;
 			for (auto j: v){
@@ -326,30 +370,13 @@ public:
 					std::cout << cnt << ' ' << std::flush;
 				}
 				cnt++;
-				a = updater(subject[subject_elem], object[object_elem], relation[relation_elem], 1);
-				b = updater(object[object_elem], subject[subject_elem], relation[relation_elem], 1);
-				c = updater(relation[relation_elem], subject[subject_elem], object[object_elem], 1);
-				subject[subject_elem] = a;
-				object[object_elem] = b;
-				relation[relation_elem] = c;
+				updater(subject_elem, object_elem, relation_elem, 1);
 
 				for(int k=0;k<random_sample;k++){
 					random_num = rand(mt);
-					a = updater(subject[random_num], object[object_elem], relation[relation_elem], -1);
-					b = updater(object[object_elem], subject[random_num], relation[relation_elem], -1);
-					c = updater(relation[relation_elem], subject[random_num], object[object_elem], -1);
-					subject[random_num] = a;
-					object[object_elem] = b;
-					relation[relation_elem] = c;
-
+					updater(random_num, object_elem, relation_elem, -1);
 					random_num = rand(mt);
-					a = updater(subject[subject_elem], object[random_num], relation[relation_elem], -1);
-					b = updater(object[random_num], subject[subject_elem], relation[relation_elem], -1);
-					c = updater(relation[relation_elem], subject[subject_elem], object[random_num], -1);
-					subject[subject_elem] = a;
-					object[random_num] = b;
-					relation[relation_elem] = c;
-				      //score = scorefuntion(subject[subject_elem], object[random_num], relation[relation_elem]);
+					updater(subject_elem, random_num, relation_elem, -1);
 				}
 			}
 			std::cout << std::endl;
@@ -363,9 +390,10 @@ public:
 				std::string subject_name = "./model/" + std::to_string(i) + "_subject.txt";
 				std::string object_name = "./model/" + std::to_string(i) + "_object.txt";
 				std::string relation_name = "./model/" + std::to_string(i) + "_relation.txt";
-				write_model(subject, subject_name);
-				write_model(object, object_name);
-				write_model(relation, relation_name);
+				normalize_vector();
+				write_model(normalize_subject, subject_name);
+				write_model(normalize_object, object_name);
+				write_model(normalize_relation, relation_name);
 				for(int x=0; x<data.tripleID.size(); x++){
 					std::cout << scorefuntion(subject[data.tripleID[x][0]], object[data.tripleID[x][2]], relation[data.tripleID[x][1]]) << std::endl;
 				}
