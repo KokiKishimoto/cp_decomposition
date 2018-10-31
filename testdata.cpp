@@ -17,7 +17,8 @@ public:
 	std::vector< std::vector <double> > subject;
 	std::vector< std::vector <double> > object;
 	std::vector< std::vector <double> > relation;
-	int triple_size;
+	int test_triple_size;
+	int sum_triple_size;
 	Test(const std::string& testid, const std::string& subjectname, const std::string& objectname, const std::string& relationname){
 		load(testid);
 		model_load(subjectname, subject);
@@ -26,18 +27,19 @@ public:
 	}
 
 	std::vector< std::vector <int> > load(const std::string& file_name){
-
 	int d;
 	std::ifstream fin(file_name, std::ios::in | std::ios::binary);
-	fin.read( ( char * ) &triple_size, sizeof(int));
-	std::cout << "tripleeeeeeeeeeesizeeeeeeeeeeeeee:" << triple_size << std::endl;
-	triple = std::vector<std::vector<int>>(triple_size, std::vector<int>(3));
-	for(int i=0; i<triple_size; i++){
-		
+	fin.read( ( char * ) &test_triple_size, sizeof(int));
+	std::cout << test_triple_size << std::endl;
+	fin.read( ( char * ) &sum_triple_size, sizeof(int));
+	std::cout << sum_triple_size << std::endl;
+	std::cout << "tripleeeeeeeeeeesizeeeeeeeeeeeeee:" << test_triple_size << std::endl;
+	triple = std::vector<std::vector<int>>(sum_triple_size, std::vector<int>(3));
+	for(int i=0; i<sum_triple_size; i++){
 		for(int j=0; j<3; j++){
 			fin.read( ( char * ) &d, sizeof(int));
 			triple[i][j] = d;
-			//std::cout << triple[i][j] << ' ';
+			//std::cout << d << ' ';
 		}
 		//std::cout << std::endl;
 			
@@ -61,6 +63,7 @@ public:
 			for(int j=0; j<dim; j++){
 				fin.read( ( char * ) &d, sizeof(double));
 				matrix[i][j] = d;
+				//std::cout << 'a' << std::endl;
 			}
 				
 		}
@@ -75,79 +78,36 @@ public:
 		return score;
 	}
 
-	//void srank(void){
-	//	int ranking;
-	//	int cnt = 0;
-	//	int all = subject.size();
-	//	double score_test;
-	//	double score;
-	//	for(auto x:triple){
-	//		ranking = 1;
-	//		score_test = 0;
-	//		score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
-	//		for(int i=0; i<subject.size(); i++){
-	//			score = 0;
-	//			score = scorefunction(subject[i], object[x[2]], relation[x[1]]);
-	//			if(score_test < score){
-	//				ranking = ranking + 1;
-	//			}
-	//		}
-	//		
-	//		if(ranking < 10){
-	//			cnt = cnt + 1;
-	//		}
-	//	}
-	//	std::cout << "cnt:" << cnt << std::endl;
-	//}
 	void srank(void){
 		int ranking;
 		int cnt = 0;
-		int all = subject.size();
 		int relation_number = relation.size() / 2;
 		double score_test;
 		double score_test2;
 		double score;
-		double score2;
 		double rate;
-		for(auto x:triple){
-			ranking = 1;
-			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
-			score_test2 = scorefunction(subject[x[2]], object[x[0]], relation[x[1]+relation_number]);
-			for(int i=0; i<subject.size(); i++){
-				score = scorefunction(subject[i], object[x[2]], relation[x[1]]);
-				if(score_test+score_test2 < score){
-					ranking = ranking + 1;
+		int subject_elem;
+		int object_elem;
+		int relation_elem;
+		for(int i=0; i<test_triple_size; i++){
+			std::set<int> remove_set;
+			subject_elem = triple[i][0];
+			object_elem = triple[i][2];
+			relation_elem = triple[i][1];
+			for(int j=0; j<sum_triple_size; j++){
+				if(subject_elem != triple[j][0] && object_elem == triple[j][2] && relation_elem == triple[j][1]){
+					remove_set.insert(triple[j][0]);
 				}
 			}
-			
-			if(ranking < 2){
-				cnt = cnt + 1;
-			}
-		}
-		rate = (float)cnt / (float)triple_size;
-		std::cout << "cnt:" << cnt << std::endl;
-		std::cout << "test triple number:" << triple_size << std::endl;
-		std::cout << "rate:" << rate << std::endl;
-	}
-
-	void orank(void){
-		int ranking;
-		int cnt = 0;
-		int all = subject.size();
-		int relation_number = relation.size() / 2;
-		double score_test;
-		double score_test2;
-		double score;
-		double score2;
-		double sum_score;
-		for(auto x:triple){
 			ranking = 1;
-			score_test = scorefunction(subject[x[0]], object[x[2]], relation[x[1]]);
-			score_test2 = scorefunction(subject[x[2]], object[x[0]], relation[x[1]+relation_number]);
-			sum_score = score_test + score_test2;
+			score_test = scorefunction(subject[subject_elem], object[object_elem], relation[relation_elem]);
+			score_test2 = scorefunction(subject[object_elem], object[subject_elem], relation[relation_elem+relation_number]);
 			for(int i=0; i<subject.size(); i++){
-				score = scorefunction(subject[x[0]], object[i], relation[x[1]]);
-				if(sum_score < score){
+				if(remove_set.find(i) != remove_set.end()){
+					continue;
+				}
+				score = scorefunction(subject[i], object[object_elem], relation[relation_elem]);
+				if(score_test+score_test2 < score){
 					ranking = ranking + 1;
 				}
 			}
@@ -156,8 +116,51 @@ public:
 				cnt = cnt + 1;
 			}
 		}
+		rate = (float)cnt / (float)test_triple_size;
 		std::cout << "cnt:" << cnt << std::endl;
+		std::cout << "test triple number:" << test_triple_size << std::endl;
+		std::cout << "rate:" << rate << std::endl;
 	}
+	void orank(void){
+		int ranking;
+		int cnt = 0;
+		int all = subject.size();
+		int relation_number = relation.size() / 2;
+		std::cout << "nuuuuuuuuuuuuuuuuuuumber relation" << relation_number << std::endl;
+		//int relation_number = 11;
+		double score_test;
+		double score_test2;
+		double score;
+		double score2;
+		double rate;
+		int subject_elem;
+		int object_elem;
+		int relation_elem;
+		std::cout << "aiueo" << std::endl;
+		for(int i=0; i<test_triple_size; i++){
+			subject_elem = triple[i][0];
+			object_elem = triple[i][2];
+			relation_elem = triple[i][1];
+			ranking = 1;
+			score_test = scorefunction(subject[subject_elem], object[object_elem], relation[relation_elem]);
+			score_test2 = scorefunction(subject[object_elem], object[subject_elem], relation[relation_elem+relation_number]);
+			for(int i=0; i<subject.size(); i++){
+				score = scorefunction(subject[subject_elem], object[i], relation[relation_elem]);
+				if(score_test+score_test2 < score){
+					ranking = ranking + 1;
+				}
+			}
+			
+			if(ranking < 10){
+				cnt = cnt + 1;
+			}
+		}
+		rate = (float)cnt / (float)test_triple_size;
+		std::cout << "cnt:" << cnt << std::endl;
+		std::cout << "test triple number:" << test_triple_size << std::endl;
+		std::cout << "rate:" << rate << std::endl;
+	}
+
 };
 int main(int argc, char *argv[]){
 	std::string testid = argv[1];

@@ -118,20 +118,20 @@ public:
 		return tripleID;
 	}
 
-	//void write_file(const std::vector < std::vector < int > >& tripleID, const std::string& filename){
-	//	int triple_size = tripleID.size();
+	void write_file(const std::vector < std::vector < int > >& tripleID, const std::string& filename){
+		int triple_size = tripleID.size();
 
-	//	std::ofstream fout;
-	//	fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
-	//	fout.write((char * ) &triple_size,sizeof(int));
-	//	for(int i=0; i<tripleID.size(); i++){
-	//		for(int j=0; j<tripleID.front().size(); j++){
-	//			fout.write(( char * ) &tripleID[i][j], sizeof( int ) );
-	//		}
-	//	}
-	//	fout.close();
+		std::ofstream fout;
+		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
+		fout.write((char * ) &triple_size,sizeof(int));
+		for(int i=0; i<tripleID.size(); i++){
+			for(int j=0; j<tripleID.front().size(); j++){
+				fout.write(( char * ) &tripleID[i][j], sizeof( int ) );
+			}
+		}
+		fout.close();
 
-	//}
+	}
 
 
 };
@@ -152,7 +152,7 @@ public:
 	Data data;
 	Data testdata;
 	Data validdata;
-	CP(const std::string& filename, const std::string& testname, const std::string& validname, const int& dimension, const std::string& testidname, const double& rate, const double& lambda){
+	CP(const std::string& filename, const std::string& testname, const int& dimension, const std::string& testidname, const double& rate, const double& lambda){
 		dim= dimension;
 		lam = lambda;
 		learning_rate = rate;
@@ -161,6 +161,7 @@ public:
 		data.add_rev();
 		data.entitydict(data.triple);
 		data.relationdict(data.triple);
+		//data.rev_dict();
 		std::cout << "saaaaaize" << data.relation_map.size() << std::endl;
 		for(auto x:data.relation_map){
 			std::cout << "key:" << x.first << "value:" << x.second << std::endl;
@@ -170,7 +171,7 @@ public:
 		std::cout << "relation_num:" << data.relation_num<< std::endl;
 		testdata.load(testname); 
 		testdata.makeid(data.entity_map, data.relation_map, testdata.triple);
-		//testdata.write_file(testdata.tripleID, testidname);
+		testdata.write_file(testdata.tripleID, testidname);
 		validdata.load(validname);
 		validdata.makeid(data.entity_map, data.relation_map, validdata.triple);
 		write_file(testdata.tripleID, data.tripleID, validdata.tripleID, testidname);
@@ -187,41 +188,33 @@ public:
 		std::cout << "entity_num:" << data.entity_num << std::endl;
 	}
 
-	void write_file( const std::vector < std::vector < int > >& test_tripleID, const std::vector < std::vector < int > >& train_tripleID, const std::vector < std::vector < int > >& valid_tripleID,  const std::string& filename){
+	void write_file( const std::vector < std::vector < int > >& test_tripleID, const std::vector < std::vector < int > >& train_tirpleID, const std::vector < std::vector < int > >& valid_tripleID,  const std::string& filename){
 		int test_triple_size = test_tripleID.size();
-		int sum_triple_size = test_tripleID.size() + train_tripleID.size() + valid_tripleID.size();
-		int train_triple_size = train_tripleID.size();
-		int valid_triple_size = valid_tripleID.size();
-		//std::cout << "test_triple_sie:" << test_triple_size << std::endl;
-		//std::cout << "train_triple_sie:" << train_triple_size << std::endl;
-		//std::cout << "valid_triple_sie:" << valid_triple_size << std::endl;
+		int train_triple_size = test_tripleID.size();
+		int valid_triple = test_tripleID.size();
+		std::cout << "test_triple_sie:" << test_triple_size() << std::endl;
+		std::cout << "train_triple_sie:" << train_triple_size() << std::endl;
+		std::cout << "valid_triple_sie:" << valid_triple_size() << std::endl;
 
 		std::ofstream fout;
 		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
 		fout.write((char * ) &test_triple_size,sizeof(int));
-		std::cout << test_triple_size << std::endl;
-		fout.write((char * ) &sum_triple_size,sizeof(int));
-		std::cout << sum_triple_size << std::endl;
-		for(int i=0; i<test_triple_size; i++){
-			std::cout << "aiueo" << std::endl;
+		for(int i=0; i<test_tripleID.size(); i++){
 			for(int j=0; j<test_tripleID.front().size(); j++){
 				fout.write(( char * ) &test_tripleID[i][j], sizeof( int ) );
 			}
-			std::cout << "aiueo" << std::endl;
 		}
-		for(int i=0; i<train_triple_size; i++){
-			std::cout << "aiueo" << std::endl;
+		fout.write((char * ) &train_triple_size,sizeof(int));
+		for(int i=0; i<train_tripleID.size(); i++){
 			for(int j=0; j<train_tripleID.front().size(); j++){
 				fout.write(( char * ) &train_tripleID[i][j], sizeof( int ) );
 			}
-			std::cout << "aiueo" << std::endl;
 		}
-		for(int i=0; i<valid_triple_size; i++){
-			std::cout << "aiueo" << std::endl;
+		fout.write((char * ) &valid_triple_size,sizeof(int));
+		for(int i=0; i<valid_tripleID.size(); i++){
 			for(int j=0; j<valid_tripleID.front().size(); j++){
 				fout.write(( char * ) &valid_tripleID[i][j], sizeof( int ) );
 			}
-			std::cout << "aiueo" << std::endl;
 		}
 		fout.close();
 
@@ -483,9 +476,8 @@ int main(int argc, char *argv[]) {
 	std::string testidname= argv[5];
 	double rate = std::stof(argv[6]);
 	double lambda = std::stof(argv[7]);
-	std::string validname = argv[8];
 
-	CP cp(filename, testname, validname, dimension, testidname, rate, lambda);
+	CP cp(filename, testname, dimension, testidname, rate, lambda);
 	cp.train(iteration);
 
 	return 0;
