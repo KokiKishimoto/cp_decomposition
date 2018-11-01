@@ -39,9 +39,7 @@ public:
 		for(int j=0; j<3; j++){
 			fin.read( ( char * ) &d, sizeof(int));
 			triple[i][j] = d;
-			//std::cout << d << ' ';
 		}
-		//std::cout << std::endl;
 			
 	}
 	fin.close();
@@ -73,13 +71,13 @@ public:
 		double score = 0;
 		for(int j = 0; j < vector1.size(); j++){
 			score = score + vector1[j] * vector2[j] * vector3[j];
-			//std::cout << vector1.size();
 		}
 		return score;
 	}
 
-	void srank(void){
-		int ranking;
+	void rank(void){
+		int s_ranking;
+		int o_ranking;
 		int cnt = 0;
 		int relation_number = relation.size() / 2;
 		double score_test;
@@ -90,74 +88,54 @@ public:
 		int object_elem;
 		int relation_elem;
 		for(int i=0; i<test_triple_size; i++){
-			std::set<int> remove_set;
+			std::set<int> s_remove_set;
+			std::set<int> o_remove_set;
 			subject_elem = triple[i][0];
 			object_elem = triple[i][2];
 			relation_elem = triple[i][1];
 			for(int j=0; j<sum_triple_size; j++){
 				if(subject_elem != triple[j][0] && object_elem == triple[j][2] && relation_elem == triple[j][1]){
-					remove_set.insert(triple[j][0]);
+					s_remove_set.insert(triple[j][0]);
+				}
+				if(subject_elem == triple[j][0] && object_elem != triple[j][2] && relation_elem == triple[j][1]){
+					o_remove_set.insert(triple[j][2]);
 				}
 			}
-			ranking = 1;
+			s_ranking = 1;
 			score_test = scorefunction(subject[subject_elem], object[object_elem], relation[relation_elem]);
 			score_test2 = scorefunction(subject[object_elem], object[subject_elem], relation[relation_elem+relation_number]);
 			for(int i=0; i<subject.size(); i++){
-				if(remove_set.find(i) != remove_set.end()){
+				if(s_remove_set.find(i) != s_remove_set.end()){
 					continue;
 				}
 				score = scorefunction(subject[i], object[object_elem], relation[relation_elem]);
 				if(score_test+score_test2 < score){
-					ranking = ranking + 1;
+					s_ranking = s_ranking + 1;
 				}
 			}
 			
-			if(ranking < 10){
+			if(s_ranking < 10){
 				cnt = cnt + 1;
 			}
-		}
-		rate = (float)cnt / (float)test_triple_size;
-		std::cout << "cnt:" << cnt << std::endl;
-		std::cout << "test triple number:" << test_triple_size << std::endl;
-		std::cout << "rate:" << rate << std::endl;
-	}
-	void orank(void){
-		int ranking;
-		int cnt = 0;
-		int all = subject.size();
-		int relation_number = relation.size() / 2;
-		std::cout << "nuuuuuuuuuuuuuuuuuuumber relation" << relation_number << std::endl;
-		//int relation_number = 11;
-		double score_test;
-		double score_test2;
-		double score;
-		double score2;
-		double rate;
-		int subject_elem;
-		int object_elem;
-		int relation_elem;
-		std::cout << "aiueo" << std::endl;
-		for(int i=0; i<test_triple_size; i++){
-			subject_elem = triple[i][0];
-			object_elem = triple[i][2];
-			relation_elem = triple[i][1];
-			ranking = 1;
-			score_test = scorefunction(subject[subject_elem], object[object_elem], relation[relation_elem]);
-			score_test2 = scorefunction(subject[object_elem], object[subject_elem], relation[relation_elem+relation_number]);
-			for(int i=0; i<subject.size(); i++){
+
+			o_ranking = 1;
+			for(int i=0; i<object.size(); i++){
+				if(o_remove_set.find(i) != o_remove_set.end()){
+					continue;
+				}
 				score = scorefunction(subject[subject_elem], object[i], relation[relation_elem]);
 				if(score_test+score_test2 < score){
-					ranking = ranking + 1;
+					o_ranking = o_ranking + 1;
 				}
 			}
 			
-			if(ranking < 10){
+			if(o_ranking < 10){
 				cnt = cnt + 1;
 			}
 		}
-		rate = (float)cnt / (float)test_triple_size;
+		rate = (float)cnt / (float)test_triple_size / 2;
 		std::cout << "cnt:" << cnt << std::endl;
-		std::cout << "test triple number:" << test_triple_size << std::endl;
+		std::cout << "test triple number:" << test_triple_size * 2 << std::endl;
 		std::cout << "rate:" << rate << std::endl;
 	}
 
@@ -168,6 +146,5 @@ int main(int argc, char *argv[]){
 	std::string objectname = argv[3];
 	std::string relationname = argv[4];
 	Test test(testid, subjectname, objectname, relationname);
-	test.srank();
-	//test.orank();
+	test.rank();
 }

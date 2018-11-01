@@ -170,7 +170,6 @@ public:
 		std::cout << "relation_num:" << data.relation_num<< std::endl;
 		testdata.load(testname); 
 		testdata.makeid(data.entity_map, data.relation_map, testdata.triple);
-		//testdata.write_file(testdata.tripleID, testidname);
 		validdata.load(validname);
 		validdata.makeid(data.entity_map, data.relation_map, validdata.triple);
 		write_file(testdata.tripleID, data.tripleID, validdata.tripleID, testidname);
