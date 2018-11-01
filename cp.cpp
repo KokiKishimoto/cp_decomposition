@@ -139,7 +139,7 @@ public:
 		lam = lambda;
 		learning_rate = rate;
 		data.load(trainname); 
-		data.add_rev();
+		//data.add_rev();
 		data.entitydict(data.triple);
 		data.relationdict(data.triple);
 		//for(auto x:data.relation_map){
@@ -427,7 +427,6 @@ int main(int argc, char **argv){
 	double rate;
 	double lambda;
 	int i;
-	i = ArgPos((char *)"-train", argc, argv);
 	if ((i = ArgPos((char *)"-train", argc, argv)) > 0) trainname = argv[i + 1];
 	if ((i = ArgPos((char *)"-test", argc, argv)) > 0) testname = argv[i + 1];
 	if ((i = ArgPos((char *)"-valid", argc, argv)) > 0) validname = argv[i + 1];

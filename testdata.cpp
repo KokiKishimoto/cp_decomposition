@@ -151,8 +151,8 @@ public:
 				cnt_top1 = cnt_top1 + 1;
 			}
 			MRR = MRR + (double)1 / (double)o_ranking;
-			if(progress_cnt % 100 == 0){
-				std::cout << progress_cnt << ' ' << (double)progress_cnt / test_triple_size / 2 * 100 << "%" << std::endl;
+			if(progress_cnt % 10 == 0){
+				std::cout << "progress:" << (double)progress_cnt / test_triple_size * 100 << "%" << std::endl;
 				progress_percent = progress_percent + 1;
 			}
 			progress_cnt = progress_cnt + 1;

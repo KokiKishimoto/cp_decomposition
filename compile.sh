@@ -17,7 +17,7 @@
 #	-rate 0.05\
 #	-lambda 0.0001
 clang++ -std=c++11 -O2 cp.cpp
-./a.out -train ./WN18RR/train.txt\
+./a.out -train ./WN18RR/a.txt\
 	-test ./WN18RR/test.txt\
 	-valid ./WN18RR/valid.txt\
 	-dimension 200\
