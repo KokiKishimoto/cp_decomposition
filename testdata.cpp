@@ -47,7 +47,6 @@ public:
 	}
 
 	void model_load(const std::string& file_name, std::vector< std::vector< double > >&matrix){
-		
 		int matrix_size;
 		int dim;
 		double d;
@@ -61,7 +60,6 @@ public:
 			for(int j=0; j<dim; j++){
 				fin.read( ( char * ) &d, sizeof(double));
 				matrix[i][j] = d;
-				//std::cout << 'a' << std::endl;
 			}
 				
 		}
@@ -78,15 +76,20 @@ public:
 	void rank(void){
 		int s_ranking;
 		int o_ranking;
-		int cnt = 0;
+		int cnt_top1 = 0;
+		int cnt_top5 = 0;
+		int cnt_top10 = 0;
+		int top1 = 1;
+		int top5 = 5;
+		int top10 = 10;
 		int relation_number = relation.size() / 2;
 		double score_test;
 		double score_test2;
 		double score;
-		double rate;
 		int subject_elem;
 		int object_elem;
 		int relation_elem;
+		double MRR = 0;
 		for(int i=0; i<test_triple_size; i++){
 			std::set<int> s_remove_set;
 			std::set<int> o_remove_set;
@@ -113,9 +116,16 @@ public:
 					s_ranking = s_ranking + 1;
 				}
 			}
+			MRR = MRR + 1 / s_ranking;
 			
-			if(s_ranking < 10){
-				cnt = cnt + 1;
+			if(s_ranking <= top10){
+				cnt_top10 = cnt_top10 + 1;
+			}
+			if(s_ranking <= top5){
+				cnt_top5 = cnt_top5 + 1;
+			}
+			if(s_ranking <= top1){
+				cnt_top1 = cnt_top1 + 1;
 			}
 
 			o_ranking = 1;
@@ -128,23 +138,63 @@ public:
 					o_ranking = o_ranking + 1;
 				}
 			}
+			//std::cout << o_ranking << std::endl;
 			
-			if(o_ranking < 10){
-				cnt = cnt + 1;
+			if(o_ranking <= top10){
+				cnt_top10 = cnt_top10 + 1;
 			}
+			if(o_ranking <= top5){
+				cnt_top5 = cnt_top5 + 1;
+			}
+			if(o_ranking <= top1){
+				cnt_top1 = cnt_top1 + 1;
+			}
+			MRR = MRR + 1 / o_ranking;
 		}
-		rate = (float)cnt / (float)test_triple_size / 2;
-		std::cout << "cnt:" << cnt << std::endl;
+		MRR = MRR / test_triple_size / 2;
+		std::cout << "cnt_top10:" << cnt_top10 << std::endl;
+		std::cout << "cnt_top5:" << cnt_top5 << std::endl;
+		std::cout << "cnt_top1:" << cnt_top1 << std::endl;
 		std::cout << "test triple number:" << test_triple_size * 2 << std::endl;
-		std::cout << "rate:" << rate << std::endl;
+		std::cout << "rate_top10:" << (float)cnt_top10 / (float)test_triple_size / 2 << std::endl;
+		std::cout << "rate_top5:" << (float)cnt_top5 / (float)test_triple_size / 2 << std::endl;
+		std::cout << "rate_top1:" << (float)cnt_top1 / (float)test_triple_size / 2 << std::endl;
+		std::cout << "MRR:" << MRR << std::endl;
 	}
 
+
 };
-int main(int argc, char *argv[]){
-	std::string testid = argv[1];
-	std::string subjectname = argv[2];
-	std::string objectname = argv[3];
-	std::string relationname = argv[4];
+
+int ArgPos(std::string str, int argc, char **argv) {
+	int a;
+	for (a = 1; a < argc; a++){
+		if (str == argv[a]) {
+			if (a == argc - 1) {
+				std::cout << "Argument missing for" << str << std::endl;
+				exit(1);
+			}
+			return a;
+		}
+	}
+	return -1;
+}
+
+int main(int argc, char **argv){
+	std::string testid;
+	std::string subjectname;
+	std::string objectname;
+	std::string relationname;
+	int i;
+	if ((i = ArgPos((char *)"-testfile", argc, argv)) > 0) testid = argv[i + 1];
+	std::cout << testid << std::endl;
+	if ((i = ArgPos((char *)"-subject_model", argc, argv)) > 0) subjectname = argv[i + 1];
+	std::cout << subjectname << std::endl;
+	if ((i = ArgPos((char *)"-object_model", argc, argv)) > 0) objectname = argv[i + 1];
+	std::cout << objectname << std::endl;
+	if ((i = ArgPos((char *)"-relation_model", argc, argv)) > 0) relationname = argv[i + 1];
+	std::cout << relationname << std::endl;
 	Test test(testid, subjectname, objectname, relationname);
 	test.rank();
+
+	return 0;
 }

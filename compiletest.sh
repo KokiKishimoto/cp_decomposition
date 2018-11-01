@@ -1,2 +1,5 @@
 clang++ -std=c++11 -O2 testdata.cpp
-./a.out testid ./model/30_subject.txt ./model/30_object.txt ./model/30_relation.txt
+./a.out -testfile testid\
+	-subject_model ./model/60_subject.txt\
+	-object_model ./model/60_object.txt\
+	-relation_model ./model/60_relation.txt

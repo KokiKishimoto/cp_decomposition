@@ -72,7 +72,6 @@ public:
 	std::map<std::string, int> relationdict(std::vector< std::vector < std::string > >& triple){
 		for(int i=0; i<triple.size(); i++){
 			if(relation_map.find(triple[i][1]) == relation_map.end()){
-				std::cout << "dafadfadfasfadf:" << triple[i][1] << std::endl;
 				relation_map[triple[i][1]] = relation_cnt;
 				relation_cnt++;
 			}
@@ -85,7 +84,6 @@ public:
 		int count = 0;
 		std::string revkey;
 		for(auto itr = relation_map.begin(); itr != relation_map.end(); ++itr) {
-        		std::cout << "keyyeeeeee = " << itr->first << ", vallllleeeee = " << itr->second << "\n";    // ????
 			revkey = "**" + itr->first;
 			relation_map[revkey] = itr->second + relation_numkari;
     		}
@@ -118,22 +116,6 @@ public:
 		return tripleID;
 	}
 
-	//void write_file(const std::vector < std::vector < int > >& tripleID, const std::string& filename){
-	//	int triple_size = tripleID.size();
-
-	//	std::ofstream fout;
-	//	fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
-	//	fout.write((char * ) &triple_size,sizeof(int));
-	//	for(int i=0; i<tripleID.size(); i++){
-	//		for(int j=0; j<tripleID.front().size(); j++){
-	//			fout.write(( char * ) &tripleID[i][j], sizeof( int ) );
-	//		}
-	//	}
-	//	fout.close();
-
-	//}
-
-
 };
 
 
@@ -152,22 +134,18 @@ public:
 	Data data;
 	Data testdata;
 	Data validdata;
-	CP(const std::string& filename, const std::string& testname, const std::string& validname, const int& dimension, const std::string& testidname, const double& rate, const double& lambda){
+	CP(const std::string& trainname, const std::string& testname, const std::string& validname, const int& dimension, const std::string& testidname, const double& rate, const double& lambda){
 		dim= dimension;
 		lam = lambda;
 		learning_rate = rate;
-		std::cout << "rate:" << learning_rate;
-		data.load(filename); 
+		data.load(trainname); 
 		data.add_rev();
 		data.entitydict(data.triple);
 		data.relationdict(data.triple);
-		std::cout << "saaaaaize" << data.relation_map.size() << std::endl;
-		for(auto x:data.relation_map){
-			std::cout << "key:" << x.first << "value:" << x.second << std::endl;
-		}
+		//for(auto x:data.relation_map){
+		//	std::cout << "key:" << x.first << "value:" << x.second << std::endl;
+		//}
 		data.makeid(data.entity_map, data.relation_map, data.triple);
-		std::cout << "entity_num:" << data.entity_num << std::endl;
-		std::cout << "relation_num:" << data.relation_num<< std::endl;
 		testdata.load(testname); 
 		testdata.makeid(data.entity_map, data.relation_map, testdata.triple);
 		validdata.load(validname);
@@ -180,10 +158,6 @@ public:
 		normalize_subject = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
 		normalize_object = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
 		normalize_relation = std::vector<std::vector<double>> (data.relation_num, std::vector<double>(dim));
-		std::cout << "sub:" << subject.size() << std::endl;
-		std::cout << "obj:" << object.size() << std::endl;
-		std::cout << "rel:" << relation.size() << std::endl;
-		std::cout << "entity_num:" << data.entity_num << std::endl;
 	}
 
 	void write_file( const std::vector < std::vector < int > >& test_tripleID, const std::vector < std::vector < int > >& train_tripleID, const std::vector < std::vector < int > >& valid_tripleID,  const std::string& filename){
@@ -191,9 +165,6 @@ public:
 		int sum_triple_size = test_tripleID.size() + train_tripleID.size() + valid_tripleID.size();
 		int train_triple_size = train_tripleID.size();
 		int valid_triple_size = valid_tripleID.size();
-		//std::cout << "test_triple_sie:" << test_triple_size << std::endl;
-		//std::cout << "train_triple_sie:" << train_triple_size << std::endl;
-		//std::cout << "valid_triple_sie:" << valid_triple_size << std::endl;
 
 		std::ofstream fout;
 		fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
@@ -202,25 +173,19 @@ public:
 		fout.write((char * ) &sum_triple_size,sizeof(int));
 		std::cout << sum_triple_size << std::endl;
 		for(int i=0; i<test_triple_size; i++){
-			std::cout << "aiueo" << std::endl;
 			for(int j=0; j<test_tripleID.front().size(); j++){
 				fout.write(( char * ) &test_tripleID[i][j], sizeof( int ) );
 			}
-			std::cout << "aiueo" << std::endl;
 		}
 		for(int i=0; i<train_triple_size; i++){
-			std::cout << "aiueo" << std::endl;
 			for(int j=0; j<train_tripleID.front().size(); j++){
 				fout.write(( char * ) &train_tripleID[i][j], sizeof( int ) );
 			}
-			std::cout << "aiueo" << std::endl;
 		}
 		for(int i=0; i<valid_triple_size; i++){
-			std::cout << "aiueo" << std::endl;
 			for(int j=0; j<valid_tripleID.front().size(); j++){
 				fout.write(( char * ) &valid_tripleID[i][j], sizeof( int ) );
 			}
-			std::cout << "aiueo" << std::endl;
 		}
 		fout.close();
 
@@ -363,14 +328,10 @@ public:
 		for(int i=0; i<subject.size(); i++){
 			norm_subject = normfunction(subject[i]);
 			norm_object = normfunction(object[i]);
-			//std::cout << "subject[i]norm:" << normfunction(subject[i]);
 			for(int j=0; j<dim; j++){
 				normalize_subject[i][j] = subject[i][j]  / normfunction(subject[i]);
 				normalize_object[i][j] = object[i][j] / normfunction(object[i]);
-				//std::cout << "subject_ij " << subject[i][j] << ' ';
-				//std::cout << "norm_subject_ij " << normalize_subject[i][j] << ' ';
 			}
-			//std::cout << std::endl;
 		}
 
 		for(int i=0; i<relation.size(); i++){
@@ -420,12 +381,9 @@ public:
 				}
 			}
 			std::cout << std::endl;
-			std::cout << "---------------" << std::endl;;
-			std::cout << "---------------" << std::endl;;
 			std::cout<< "---------" << i << "----------" << std::endl;
 			std::cout << "scorreeeee:" << scorefuntion(subject[data.tripleID[0][0]], object[data.tripleID[0][2]], relation[data.tripleID[0][1]]) << std::endl;
-			std::cout << "---------------" << std::endl;;
-			std::cout << "---------------" << std::endl;;
+			std::cout<< "--------------------" << std::endl;
 			if(i % 10 ==0){
 				std::string subject_name = "./model/" + std::to_string(i) + "_subject.txt";
 				std::string object_name = "./model/" + std::to_string(i) + "_object.txt";
@@ -444,49 +402,42 @@ public:
 	}
 };
 
-class Test{
-public:
-	std::vector< std::vector < int > > triple;
-	Test(const std::string& testid, const std::string& subject){
-		load(testid);
 
-	}
-
-	std::vector< std::vector <int> > load(const std::string& file_name){
-        	std::fstream fs;
-		std::vector<int> tmp(3);
-		int l,m,n;
-		fs.open(file_name, std::ios::in);
-		while (fs >> l >> m >> n){
-			tmp[0] = l;
-			tmp[1] = m;
-			tmp[2] = n;
-			
-			triple.push_back(tmp);
+int ArgPos(std::string str, int argc, char **argv) {
+	int a;
+	for (a = 1; a < argc; a++){
+		if (str == argv[a]) {
+			if (a == argc - 1) {
+				std::cout << "Argument missing for" << str << std::endl;
+				exit(1);
+			}
+			return a;
 		}
-		
-		fs.close(); 
-		return triple;
 	}
-	
-};
+	return -1;
+}
 
-
-
-int main(int argc, char *argv[]) {
-
-	std::string filename = argv[1];
-	std::string testname = argv[2];
-	int dimension = atoi(argv[3]);
-	int iteration = atoi(argv[4]);
-	std::string testidname= argv[5];
-	double rate = std::stof(argv[6]);
-	double lambda = std::stof(argv[7]);
-	std::string validname = argv[8];
-
-	CP cp(filename, testname, validname, dimension, testidname, rate, lambda);
+int main(int argc, char **argv){
+	std::string trainname;
+	std::string testname;
+	std::string validname;
+	int dimension;
+	int iteration;
+	std::string testidname;
+	double rate;
+	double lambda;
+	int i;
+	i = ArgPos((char *)"-train", argc, argv);
+	if ((i = ArgPos((char *)"-train", argc, argv)) > 0) trainname = argv[i + 1];
+	if ((i = ArgPos((char *)"-test", argc, argv)) > 0) testname = argv[i + 1];
+	if ((i = ArgPos((char *)"-valid", argc, argv)) > 0) validname = argv[i + 1];
+	if ((i = ArgPos((char *)"-dimension", argc, argv)) > 0) dimension = atoi(argv[i + 1]);
+	if ((i = ArgPos((char *)"-iteration", argc, argv)) > 0) iteration = atoi(argv[i + 1]);
+	if ((i = ArgPos((char *)"-testid", argc, argv)) > 0) testidname = argv[i + 1];
+	if ((i = ArgPos((char *)"-rate", argc, argv)) > 0) rate = std::stof(argv[i + 1]);
+	if ((i = ArgPos((char *)"-lambda", argc, argv)) > 0) lambda = std::stof(argv[i + 1]);
+	CP cp(trainname, testname, validname, dimension, testidname, rate, lambda);
 	cp.train(iteration);
 
 	return 0;
 }
-
