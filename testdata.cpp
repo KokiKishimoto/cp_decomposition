@@ -33,7 +33,7 @@ public:
 	std::cout << test_triple_size << std::endl;
 	fin.read( ( char * ) &sum_triple_size, sizeof(int));
 	std::cout << sum_triple_size << std::endl;
-	std::cout << "tripleeeeeeeeeeesizeeeeeeeeeeeeee:" << test_triple_size << std::endl;
+	std::cout << "tripleeeeeeeeeeesizeeeeeeeeeeeeee:" << test_triple_size * 2 << std::endl;
 	triple = std::vector<std::vector<int>>(sum_triple_size, std::vector<int>(3));
 	for(int i=0; i<sum_triple_size; i++){
 		for(int j=0; j<3; j++){
@@ -76,6 +76,8 @@ public:
 	void rank(void){
 		int s_ranking;
 		int o_ranking;
+		int progress_cnt = 0;
+		int progress_percent = 0;
 		int cnt_top1 = 0;
 		int cnt_top5 = 0;
 		int cnt_top10 = 0;
@@ -116,7 +118,7 @@ public:
 					s_ranking = s_ranking + 1;
 				}
 			}
-			MRR = MRR + 1 / s_ranking;
+			MRR = MRR + (double)1 / (double)s_ranking;
 			
 			if(s_ranking <= top10){
 				cnt_top10 = cnt_top10 + 1;
@@ -138,7 +140,6 @@ public:
 					o_ranking = o_ranking + 1;
 				}
 			}
-			//std::cout << o_ranking << std::endl;
 			
 			if(o_ranking <= top10){
 				cnt_top10 = cnt_top10 + 1;
@@ -149,7 +150,13 @@ public:
 			if(o_ranking <= top1){
 				cnt_top1 = cnt_top1 + 1;
 			}
-			MRR = MRR + 1 / o_ranking;
+			MRR = MRR + (double)1 / (double)o_ranking;
+			if(progress_cnt % 100 == 0){
+				std::cout << progress_cnt << ' ' << (double)progress_cnt / test_triple_size / 2 * 100 << "%" << std::endl;
+				progress_percent = progress_percent + 1;
+			}
+			progress_cnt = progress_cnt + 1;
+
 		}
 		MRR = MRR / test_triple_size / 2;
 		std::cout << "cnt_top10:" << cnt_top10 << std::endl;
@@ -186,13 +193,9 @@ int main(int argc, char **argv){
 	std::string relationname;
 	int i;
 	if ((i = ArgPos((char *)"-testfile", argc, argv)) > 0) testid = argv[i + 1];
-	std::cout << testid << std::endl;
 	if ((i = ArgPos((char *)"-subject_model", argc, argv)) > 0) subjectname = argv[i + 1];
-	std::cout << subjectname << std::endl;
 	if ((i = ArgPos((char *)"-object_model", argc, argv)) > 0) objectname = argv[i + 1];
-	std::cout << objectname << std::endl;
 	if ((i = ArgPos((char *)"-relation_model", argc, argv)) > 0) relationname = argv[i + 1];
-	std::cout << relationname << std::endl;
 	Test test(testid, subjectname, objectname, relationname);
 	test.rank();
 
