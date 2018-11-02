@@ -171,142 +171,6 @@ public:
 
 };
 
-//class TrainData{
-//public:
-//	std::vector < std::vector < int > > train_tripleID;
-//	MakeDict makedict;
-//	TrainData(const std::string& trainname) : makedict(trainname) {
-//		std::cout << makedict.triple.size() << std::endl;
-//		train_tripleID = makeid(makedict.triple);
-//		for(int i=0; i<train_tripleID.size(); i++){
-//			std::cout << train_tripleID[i][0] << ' ' << train_tripleID[i][1] << ' ' << train_tripleID[i][2] << std::endl;
-//		}
-//		std::cout << "aiueo" << std::endl;
-//
-//	}
-//
-//	std::vector< std::vector < int > > makeid(const std::vector< std::vector < std::string> >& triple){
-//		std::vector< std::vector < int > > tripleID;
-//		std::vector<int> tmp(3);
-//		std::cout << "kakikukeko" << std::endl;
-//		std::cout << triple.size() << std::endl;
-//		for(int i=0; i<triple.size(); i++){
-//			if (makedict.entity_map.find(triple[i][0]) == makedict.entity_map.end() || makedict.relation_map.find(triple[i][1]) == makedict.relation_map.end() || makedict.entity_map.find(triple[i][2]) == makedict.entity_map.end()){
-//				std::cout << "idfadfajsdf;akldf;a" << std::endl;
-//				continue;
-//			}else{
-//    
-//				tmp[0] = makedict.entity_map[triple[i][0]];
-//				tmp[1] = makedict.relation_map[triple[i][1]];
-//				tmp[2] = makedict.entity_map[triple[i][2]];
-//				//std::cout << tmp[0] << ' '<< tmp[1] <<' ' << tmp[2] << std::endl;
-//
-//				tripleID.push_back(tmp);
-//			}
-//			//std::cout << train_tripleID[i][0] << ' ' << train_tripleID[i][1] << ' ' << train_tripleID[i][2] << ' ' << std::endl;
-//
-//		}
-//		return tripleID;
-//	}
-//};
-//class TestData{
-//public:
-//	TrainData traindata;
-//	std::vector < std::vector < std::string > > test_triple;
-//	std::vector < std::vector < std::string > > valid_triple;
-//	std::vector < std::vector < int > > test_tripleID;
-//	std::vector < std::vector < int > > valid_tripleID;
-//	//std::cout << "aiueo" << std::endl;
-//	//std::cout << traindata.train_tripleID[0][0] << std::endl;;
-//	//int x =  traindata.train_tripleID[0][0];
-//
-//
-//	TestData(const std::string& trainname, const std::string& testname, const std::string& validname, const std::string& testidname) : traindata(trainname){
-//		//std::cout << traindata.triple[0][0] << ' ' << traindata.triple[0][1] << ' ' <<  traindata.triple[0][2] << std::endl;
-//		test_triple = load(testname);
-//		valid_triple = load(validname);
-//		test_tripleID = makeid(test_triple);
-//		valid_tripleID = makeid(valid_triple);
-//		write_file( test_tripleID, traindata.train_tripleID, valid_tripleID, testidname);
-//	}
-//
-//	std::vector< std::vector <std::string> > load(const std::string& file_name){
-//		std::vector < std::vector < std::string > > triple;
-//        	std::fstream fs;
-//		std::vector<std::string> tmp(3);
-//		std::string l,m,n;
-//		fs.open(file_name, std::ios::in);
-//		while (fs >> l >> m >> n){
-//			tmp[0] = l;
-//			tmp[1] = m;
-//			tmp[2] = n;
-//			triple.push_back(tmp);
-//		}
-//		//for(int i=0; i<triple.size(); i++){
-//		//	std::cout << triple[i][0] << ' ' << triple[i][1] << ' ' << triple[i][2] << std::endl;
-//		//}
-//		
-//		fs.close(); 
-//		return triple;
-//	}
-//	std::vector< std::vector < int > > makeid(const std::vector< std::vector < std::string> >& triple){
-//		std::vector< std::vector < int > > tripleID;
-//		std::vector<int> tmp(3);
-//		//std::cout << "kakikukeko" << std::endl;
-//		//std::cout << triple.size() << std::endl;
-//		for(int i=0; i<triple.size(); i++){
-//			if (traindata.makedict.entity_map.find(triple[i][0]) == traindata.makedict.entity_map.end() || traindata.makedict.relation_map.find(triple[i][1]) == traindata.makedict.relation_map.end() || traindata.makedict.entity_map.find(triple[i][2]) == traindata.makedict.entity_map.end()){
-//				std::cout << "idfadfajsdf;akldf;a" << std::endl;
-//				continue;
-//			}else{
-//    
-//				tmp[0] = traindata.makedict.entity_map[triple[i][0]];
-//				tmp[1] = traindata.makedict.relation_map[triple[i][1]];
-//				tmp[2] = traindata.makedict.entity_map[triple[i][2]];
-//				//std::cout << tmp[0] << ' '<< tmp[1] <<' ' << tmp[2] << std::endl;
-//
-//				tripleID.push_back(tmp);
-//			}
-//			//std::cout << tripleID[i][0] << ' ' << tripleID[i][1] << ' ' << tripleID[i][2] << ' ' << std::endl;
-//
-//		}
-//		return tripleID;
-//	}
-//	void write_file( const std::vector < std::vector < int > >& test_tripleID, const std::vector < std::vector < int > >& train_tripleID, const std::vector < std::vector < int > >& valid_tripleID,  const std::string& testidname){
-//		int test_triple_size = test_tripleID.size();
-//		int train_triple_size = train_tripleID.size();
-//		int valid_triple_size = valid_tripleID.size();
-//		int sum_triple_size = test_tripleID.size() + train_tripleID.size() + valid_tripleID.size();
-//
-//		std::ofstream fout;
-//		fout.open(testidname, std::ios::out|std::ios::binary|std::ios::trunc);
-//		fout.write((char * ) &test_triple_size,sizeof(int));
-//		std::cout << test_triple_size << std::endl;
-//		fout.write((char * ) &sum_triple_size,sizeof(int));
-//		std::cout << sum_triple_size << std::endl;
-//		for(int i=0; i<test_triple_size; i++){
-//			for(int j=0; j<test_tripleID.front().size(); j++){
-//				fout.write(( char * ) &test_tripleID[i][j], sizeof( int ) );
-//			}
-//		}
-//		for(int i=0; i<train_triple_size; i++){
-//			for(int j=0; j<train_tripleID.front().size(); j++){
-//				fout.write(( char * ) &train_tripleID[i][j], sizeof( int ) );
-//			}
-//		}
-//		for(int i=0; i<valid_triple_size; i++){
-//			for(int j=0; j<valid_tripleID.front().size(); j++){
-//				fout.write(( char * ) &valid_tripleID[i][j], sizeof( int ) );
-//			}
-//		}
-//		fout.close();
-//
-//	}
-//};
-
-
-
-
 class CP{
 public:
 	std::vector< std::vector <double> > subject;
@@ -319,24 +183,10 @@ public:
 	double learning_rate;
 	double lam;
 	Data data;
-	//data testdata;
-	//data validdata;
 	CP(const std::string& trainname, const std::string& testname, const std::string& validname, const int& dimension, const std::string& testidname, const double& rate, const double& lambda) : data(trainname, testname, validname, testidname){
-		//data(trainname);
-		//data data(trainname);
-		//TrainData data(trainname);
 		dim= dimension;
 		lam = lambda;
 		learning_rate = rate;
-		//data.load(trainname); 
-		//data.entitydict(data.triple);
-		//data.relationdict(data.triple);
-		//data.makeid(data.entity_map, data.relation_map, data.triple);
-		//testdata.load(testname); 
-		//testdata.makeid(data.entity_map, data.relation_map, testdata.triple);
-		//validdata.load(validname);
-		//validdata.makeid(data.entity_map, data.relation_map, validdata.triple);
-		//write_file(testdata.tripleID, data.tripleID, validdata.tripleID, testidname);
 
 		subject = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
 		object = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
@@ -346,38 +196,6 @@ public:
 		normalize_relation = std::vector<std::vector<double>> (data.relation_num, std::vector<double>(dim));
 	}
 
-	//void write_file( const std::vector < std::vector < int > >& test_tripleID, const std::vector < std::vector < int > >& train_tripleID, const std::vector < std::vector < int > >& valid_tripleID,  const std::string& filename){
-	//	int test_triple_size = test_tripleID.size();
-	//	int sum_triple_size = test_tripleID.size() + train_tripleID.size() + valid_tripleID.size();
-	//	int train_triple_size = train_tripleID.size();
-	//	int valid_triple_size = valid_tripleID.size();
-
-	//	std::ofstream fout;
-	//	fout.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
-	//	fout.write((char * ) &test_triple_size,sizeof(int));
-	//	std::cout << test_triple_size << std::endl;
-	//	fout.write((char * ) &sum_triple_size,sizeof(int));
-	//	std::cout << sum_triple_size << std::endl;
-	//	for(int i=0; i<test_triple_size; i++){
-	//		for(int j=0; j<test_tripleID.front().size(); j++){
-	//			fout.write(( char * ) &test_tripleID[i][j], sizeof( int ) );
-	//		}
-	//	}
-	//	for(int i=0; i<train_triple_size; i++){
-	//		for(int j=0; j<train_tripleID.front().size(); j++){
-	//			fout.write(( char * ) &train_tripleID[i][j], sizeof( int ) );
-	//		}
-	//	}
-	//	for(int i=0; i<valid_triple_size; i++){
-	//		for(int j=0; j<valid_tripleID.front().size(); j++){
-	//			fout.write(( char * ) &valid_tripleID[i][j], sizeof( int ) );
-	//		}
-	//	}
-	//	fout.close();
-
-	//}
-
-		
 	void randominitialize(const int&entity_size, const int&relation_size){
 		std::random_device rnd;     
     		std::mt19937 mt(rnd());     
@@ -506,28 +324,42 @@ public:
 		}
 		fout.close();
 	}
-	void normalize_vector(void){
-		double norm_subject = 0; 
-		double norm_object = 0; 
-		double norm_relation = 0; 
+	std::vector< std::vector < double > >normalize_vector(std::vector< std::vector< double > >& matrix){
+		std::vector< std::vector< double > > normalize_matrix = std::vector< std::vector < double > > (matrix.size(), std::vector< double > (matrix.front().size()));
+		//subject = std::vector<std::vector<double>> (data.entity_num, std::vector<double>(dim));
+		double norm = 0; 
 
-		for(int i=0; i<subject.size(); i++){
-			norm_subject = normfunction(subject[i]);
-			norm_object = normfunction(object[i]);
-			for(int j=0; j<dim; j++){
-				normalize_subject[i][j] = subject[i][j]  / normfunction(subject[i]);
-				normalize_object[i][j] = object[i][j] / normfunction(object[i]);
+		for(int i=0; i<matrix.size(); i++){
+			norm = normfunction(matrix[i]);
+			for(int j=0; j<matrix.front().size(); j++){
+				normalize_matrix[i][j] = matrix[i][j]  / norm;
 			}
 		}
-
-		for(int i=0; i<relation.size(); i++){
-			norm_relation= normfunction(relation[i]);
-			for(int j=0; j<dim; j++){
-				normalize_relation[i][j] = relation[i][j] / normfunction(relation[i]);
-			}
-		}
+		return normalize_matrix;
 
 	}
+	//void normalize_vector(void){
+	//	double norm_subject = 0; 
+	//	double norm_object = 0; 
+	//	double norm_relation = 0; 
+
+	//	for(int i=0; i<subject.size(); i++){
+	//		norm_subject = normfunction(subject[i]);
+	//		norm_object = normfunction(object[i]);
+	//		for(int j=0; j<dim; j++){
+	//			normalize_subject[i][j] = subject[i][j]  / normfunction(subject[i]);
+	//			normalize_object[i][j] = object[i][j] / normfunction(object[i]);
+	//		}
+	//	}
+
+	//	for(int i=0; i<relation.size(); i++){
+	//		norm_relation= normfunction(relation[i]);
+	//		for(int j=0; j<dim; j++){
+	//			normalize_relation[i][j] = relation[i][j] / normfunction(relation[i]);
+	//		}
+	//	}
+
+	//}
 
 
 	void train(const int& iter){
@@ -574,10 +406,10 @@ public:
 				std::string subject_name = "./model/" + std::to_string(i) + "_subject.txt";
 				std::string object_name = "./model/" + std::to_string(i) + "_object.txt";
 				std::string relation_name = "./model/" + std::to_string(i) + "_relation.txt";
-				normalize_vector();
-				write_model(normalize_subject, subject_name);
-				write_model(normalize_object, object_name);
-				write_model(normalize_relation, relation_name);
+				normalize_vector(subject);
+				write_model(normalize_vector(subject), subject_name);
+				write_model(normalize_vector(object), object_name);
+				write_model(normalize_vector(relation), relation_name);
 				for(int x=0; x<data.train_tripleID.size(); x++){
 					std::cout << scorefuntion(subject[data.train_tripleID[x][0]], object[data.train_tripleID[x][2]], relation[data.train_tripleID[x][1]]) << std::endl;
 				}
