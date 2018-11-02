@@ -79,10 +79,10 @@ public:
 		int progress_cnt = 0;
 		int progress_percent = 0;
 		int cnt_top1 = 0;
-		int cnt_top5 = 0;
+		int cnt_top3 = 0;
 		int cnt_top10 = 0;
 		int top1 = 1;
-		int top5 = 5;
+		int top3 = 3;
 		int top10 = 10;
 		int relation_number = relation.size() / 2;
 		double score_test;
@@ -123,8 +123,8 @@ public:
 			if(s_ranking <= top10){
 				cnt_top10 = cnt_top10 + 1;
 			}
-			if(s_ranking <= top5){
-				cnt_top5 = cnt_top5 + 1;
+			if(s_ranking <= top3){
+				cnt_top3 = cnt_top3 + 1;
 			}
 			if(s_ranking <= top1){
 				cnt_top1 = cnt_top1 + 1;
@@ -144,8 +144,8 @@ public:
 			if(o_ranking <= top10){
 				cnt_top10 = cnt_top10 + 1;
 			}
-			if(o_ranking <= top5){
-				cnt_top5 = cnt_top5 + 1;
+			if(o_ranking <= top3){
+				cnt_top3 = cnt_top3 + 1;
 			}
 			if(o_ranking <= top1){
 				cnt_top1 = cnt_top1 + 1;
@@ -160,11 +160,11 @@ public:
 		}
 		MRR = MRR / test_triple_size / 2;
 		std::cout << "cnt_top10:" << cnt_top10 << std::endl;
-		std::cout << "cnt_top5:" << cnt_top5 << std::endl;
+		std::cout << "cnt_top3:" << cnt_top3 << std::endl;
 		std::cout << "cnt_top1:" << cnt_top1 << std::endl;
 		std::cout << "test triple number:" << test_triple_size * 2 << std::endl;
 		std::cout << "rate_top10:" << (float)cnt_top10 / (float)test_triple_size / 2 << std::endl;
-		std::cout << "rate_top5:" << (float)cnt_top5 / (float)test_triple_size / 2 << std::endl;
+		std::cout << "rate_top3:" << (float)cnt_top3 / (float)test_triple_size / 2 << std::endl;
 		std::cout << "rate_top1:" << (float)cnt_top1 / (float)test_triple_size / 2 << std::endl;
 		std::cout << "MRR:" << MRR << std::endl;
 	}
