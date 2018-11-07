@@ -406,7 +406,7 @@ public:
 				std::string subject_name = "./model/" + std::to_string(i) + "_subject.txt";
 				std::string object_name = "./model/" + std::to_string(i) + "_object.txt";
 				std::string relation_name = "./model/" + std::to_string(i) + "_relation.txt";
-				normalize_vector(subject);
+				//normalize_vector(subject);
 				write_model(normalize_vector(subject), subject_name);
 				write_model(normalize_vector(object), object_name);
 				write_model(normalize_vector(relation), relation_name);
