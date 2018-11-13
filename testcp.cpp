@@ -45,6 +45,7 @@ public:
 		for (int i = 0; i < entitySize; i++) {
 			std::string tmp;
 			fin >> tmp;
+			subjVec[i].resize(vecDim);
 			for (int j = 0; j < vecDim; j++) {
 				fin >> subjVec[i][j];
 			}
@@ -57,6 +58,7 @@ public:
 		for (int i = 0; i < entitySize; i++) {
 			std::string tmp;
 			fin >> tmp;
+			objVec[i].resize(vecDim);
 			for (int j = 0; j < vecDim; j++) {
 				fin >> objVec[i][j];
 			}
@@ -66,9 +68,11 @@ public:
 		fin.open(modelRelFile);
 		int relationSize;
 		fin >> relationSize >> vecDim;
+		relationVec.resize(relationSize);
 		for (int i = 0; i < relationSize; i++) {
 			std::string tmp;
 			fin >> tmp;
+			relationVec[i].resize(vecDim);
 			for (int j = 0; j < vecDim; j++) {
 				fin >> relationVec[i][j];
 			}

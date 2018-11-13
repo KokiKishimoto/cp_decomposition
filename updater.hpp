@@ -12,21 +12,19 @@ public:
 	double threshold;
 	double eta;
 
-	std::vector< std::vector<double> > subjVec, objVec, relationVec;
-
 	Updater() {}
 
-	Updater(const std::vector< std::vector<double> >& subjVec_, const std::vector< std::vector<double> >& objVec_, const std::vector< std::vector<double> >& relationVec_, double learningRate_, double threshold_) 
-	: subjVec(subjVec_), objVec(objVec_), relationVec(relationVec_), initialRate(learningRate_), learningRate(learningRate_), threshold(threshold_) {
-		lambda = 1.0 / std::pow(10.0, 8.0);
+	Updater(double learningRate_, double threshold_) 
+	: initialRate(learningRate_), learningRate(learningRate_), threshold(threshold_) {
+		lambda = 1e-8;
 	}
 
 	void decay(double time) {
 		learningRate = initialRate / (1.0 + initialRate * lambda * time);
 	}
 
-	void SGD(Triple& triple, std::vector<double>& gradient_r, std::vector<double>& gradient_s, std::vector<double>& gradient_o, std::vector<double>& norms) {
-		std::vector<double> r_v = relationVec[triple.relation];
+	void SGD(Triple& triple, std::vector<double>& gradient_r, std::vector<double>& gradient_s, std::vector<double>& gradient_o, std::vector<double>& norms, std::vector< std::vector<double> >& subjVec, std::vector< std::vector<double> >& objVec, std::vector< std::vector<double> >& relationVec) {
+		std::vector<double>& r_v = relationVec[triple.relation];
 		if (norms[0] >= threshold) {
 			double x = (threshold / norms[0]);
 			for (int i = 0; i < gradient_r.size(); i++) {
@@ -38,7 +36,7 @@ public:
 			}			
 		}
 
-		std::vector<double> s_e_v = subjVec[triple.subj];
+		std::vector<double>& s_e_v = subjVec[triple.subj];
 		if (norms[1] >= threshold) {
 			double x = (threshold / norms[1]);
 			for (int i = 0; i < gradient_s.size(); i++) {
@@ -50,7 +48,7 @@ public:
 			}			
 		}
 
-		std::vector<double> o_e_v = objVec[triple.obj];
+		std::vector<double>& o_e_v = objVec[triple.obj];
 		if (norms[2] >= threshold) {
 			double x = (threshold / norms[2]);
 			for (int i = 0; i < gradient_o.size(); i++) {

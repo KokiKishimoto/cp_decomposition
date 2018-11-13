@@ -59,7 +59,7 @@ public:
 			}
 		}
 
-		updater = Updater(subjVec, objVec, relationVec, learningRate, threshold);
+		updater = Updater(learningRate, threshold);
 
 		outVec1.resize(vecDim);
 		outVec2.resize(vecDim);
@@ -117,15 +117,15 @@ public:
 				for (int i = 0; i <= negativeSize; i++) {
 					if (i == 0) {
 						loss += computeGradients(triple, 1.0);
-						updater.SGD(triple, outVec1, outVec2, outVec3, norms);
+						updater.SGD(triple, outVec1, outVec2, outVec3, norms, subjVec, objVec, relationVec);
 					} else {
 						Triple neg_triple = sampler.negativeSamplingSbj(triple, triple_key_set);
 						loss += computeGradients(neg_triple, -1.0);
-						updater.SGD(neg_triple, outVec1, outVec2, outVec3, norms);
+						updater.SGD(neg_triple, outVec1, outVec2, outVec3, norms, subjVec, objVec, relationVec);
 
 						neg_triple = sampler.negativeSamplingObj(triple, triple_key_set);
 						loss += computeGradients(neg_triple, -1.0);
-						updater.SGD(neg_triple, outVec1, outVec2, outVec3, norms);
+						updater.SGD(neg_triple, outVec1, outVec2, outVec3, norms, subjVec, objVec, relationVec);
 					}
 				}
 				if (updater.learningRate <= 0.0) {
