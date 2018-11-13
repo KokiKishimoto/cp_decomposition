@@ -4,6 +4,7 @@
 #include "triple.hpp"
 #include "triple_key_gen.hpp"
 
+#include <iostream>
 #include <fstream>
 #include <map>
 #include <set>
@@ -23,19 +24,14 @@ public:
 
 	void readFromRawFile(std::string filename) {
 		std::ifstream fin;
-		std::string word;
-		std::vector<std::string> tmp;
 
 		fin.open(filename);
-		while (getline(fin, word, '\t')) {
-			tmp.push_back(word);
-			if ((int)tmp.size() == 3) {
-				int subj = addEntity(tmp[0]);
-				int obj = addEntity(tmp[2]);
-				int relation = addRelation(tmp[1]);
-				triples.emplace_back(subj, relation, obj);
-				tmp.clear();
-			}
+		std::string t0, t1, t2;
+		while (fin >> t0 >> t1 >> t2) {
+			int subj = addEntity(t0);
+			int obj = addEntity(t2);
+			int relation = addRelation(t1);
+			triples.emplace_back(subj, relation, obj);
 		}
 
 		key_gen = TripleKeyGen(entity_counter, relation_counter);

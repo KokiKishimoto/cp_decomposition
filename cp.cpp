@@ -6,6 +6,8 @@
 #include "model_file_writer.hpp"
 
 #include <algorithm>
+#include <iomanip>
+#include <iostream>
 #include <cmath>
 #include <random>
 #include <set>
@@ -134,7 +136,7 @@ public:
 				}
 			}
 			std::cerr << std::endl;
-			std::cerr << "Total loss: " << loss << std::endl;
+			std::cerr << std::fixed << std::setprecision(15) << "Total loss: " << loss << std::endl;
 
 			loss = 0.0;
 			sampleC = 1;

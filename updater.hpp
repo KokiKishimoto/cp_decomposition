@@ -17,7 +17,7 @@ public:
 	Updater() {}
 
 	Updater(const std::vector< std::vector<double> >& subjVec_, const std::vector< std::vector<double> >& objVec_, const std::vector< std::vector<double> >& relationVec_, double learningRate_, double threshold_) 
-	: subjVec(subjVec_), objVec(objVec_), relationVec(relationVec_), initialRate(learningRate_), learningRate(learningRate_) {
+	: subjVec(subjVec_), objVec(objVec_), relationVec(relationVec_), initialRate(learningRate_), learningRate(learningRate_), threshold(threshold_) {
 		lambda = 1.0 / std::pow(10.0, 8.0);
 	}
 
