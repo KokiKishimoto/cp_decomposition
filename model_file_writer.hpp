@@ -52,8 +52,8 @@ public:
 
 		fout.open("./model/" + std::to_string(iter) + "_relation.txt");
 
-		fout << data.entity_counter << " " << objVec[0].size() << "\n";
-		for (int i = 0; i < data.entity_counter; i++) {
+		fout << data.relation_counter << " " << relationVec[0].size() << "\n";
+		for (int i = 0; i < data.relation_counter; i++) {
 			const std::vector<double>& vec = relationVec[i];
 			const double norm = op.norm(vec);
 			fout << data.relation_dict_rev[i] << " ";

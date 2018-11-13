@@ -64,7 +64,7 @@ public:
 		outVec3.resize(vecDim);
 
 		norms.resize(3);
-	}	
+	}
 
 	double sigmoid(double x) { return 1.0 / (1.0 + std::exp(-x));}
 
