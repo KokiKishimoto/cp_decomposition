@@ -269,7 +269,7 @@ public:
 			for (int entity = 0; entity<trainData.entity_counter; ++entity) {
 				RankScore& r1 = scores_subj[entity]; 
 				r1.set(entity, innerProductSubj(entity, outVec2) + innerProductObj(entity, outVec3_inv));
-				RankScore r2 = scores_obj[entity];
+				RankScore& r2 = scores_obj[entity];
 				r2.set(entity, innerProductObj(entity, outVec3) + innerProductSubj(entity, outVec2_inv));
 			}
 			std::sort(scores_subj.begin(), scores_subj.end());
