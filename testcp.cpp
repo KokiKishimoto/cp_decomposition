@@ -141,7 +141,7 @@ public:
 			Key k_s(test_tuple.relation, test_tuple.obj);
 			Key k_o(test_tuple.relation, test_tuple.subj);
 			const std::set<int>& hypo_s = subjSet[k_s];
-			const std::set<int>& hypo_o = subjSet[k_o];
+			const std::set<int>& hypo_o = objSet[k_o];
 
 			int rank1 = -1, rank2 = -1;
 			int rank_filter_1 = -1, rank_filter_2 = -1;
@@ -277,7 +277,7 @@ public:
 			Key k_s(test_tuple.relation, test_tuple.obj);
 			Key k_o(test_tuple.relation, test_tuple.subj);
 			const std::set<int>& hypo_s = subjSet[k_s];
-			const std::set<int>& hypo_o = subjSet[k_o];
+			const std::set<int>& hypo_o = objSet[k_o];
 
 			int rank1 = -1, rank2 = -1;
 			int rank_filter_1 = -1, rank_filter_2 = -1;
