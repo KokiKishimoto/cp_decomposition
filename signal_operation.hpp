@@ -36,6 +36,31 @@ public:
 		}
 		return out1;
 	}
+
+	double quantize(const double& x) {
+		if(x < 0){
+			return -1.0 / 3.0;
+		}else{
+			return 1.0 /3.0;
+		}
+	}
+	
+	double qproduct(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, std::vector<double>& out1, std::vector<double>& out2, std::vector<double>& out3){
+		double score = 0.0;
+		for(int i = 0; i < a.size(); i++){
+			double a_ = quantize(a[i]);
+			double b_ = quantize(b[i]);
+			double c_ = quantize(c[i]);
+			out1[i] = a_ * b_;
+			out2[i] = b_ * c_;
+			out3[i] = c_ * a_;
+			score += c_ * out1[i];
+		}
+		return score;
+	}
 };
+
+
+
 
 #endif // SIGNAL_OPERATION_HPP
