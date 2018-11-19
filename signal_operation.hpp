@@ -37,11 +37,23 @@ public:
 		return out1;
 	}
 
+	//double quantize(const double& x) {
+	//	if(x < 0){
+	//		return -1.0 / 3.0;
+	//	}else{
+	//		return 1.0 /3.0;
+	//	}
+	//}
+	
 	double quantize(const double& x) {
-		if(x < 0){
-			return -1.0 / 3.0;
+		if(x < -1.0/2.0){
+			return -3.0 / 4.0;
+		}else if(-1.0/2.0<=x && x<0){
+			return -1.0 /4.0;
+		}else if(0<=x && x<1.0/2.0){
+			return 1.0/4.0;
 		}else{
-			return 1.0 /3.0;
+			return 3.0/4.0;
 		}
 	}
 	
