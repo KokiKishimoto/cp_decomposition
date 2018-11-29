@@ -1,6 +1,6 @@
 clang++ -std=c++11 -O2 add_rev.cpp
 ./a.out -file_name ./wordnet-mlj12/wordnet-mlj12-train.txt -rev_filename ./wordnet-mlj12/a.txt
-clang++ -std=c++11 -O2 quantizedcp.cpp
+clang++ -std=c++11 -O2 ./quantizedcp.cpp
 ./a.out -train ./wordnet-mlj12/a.txt \
 	-dimension 400 \
 	-iteration 100 \

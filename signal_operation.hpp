@@ -46,16 +46,25 @@ public:
 	//}
 	
 	double quantize(const double& x) {
-		if(x < -1.0/2.0){
-			return -3.0 / 4.0;
-		}else if(-1.0/2.0<=x && x<0){
-			return -1.0 /4.0;
-		}else if(0<=x && x<1.0/2.0){
-			return 1.0/4.0;
+		if(x < 0.5){
+			return 0.0;
 		}else{
-			return 3.0/4.0;
+			return 1.0;
 		}
 	}
+
+	
+	//double quantize(const double& x) {
+	//	if(x < -1.0/2.0){
+	//		return -3.0 / 4.0;
+	//	}else if(-1.0/2.0<=x && x<0){
+	//		return -1.0 /4.0;
+	//	}else if(0<=x && x<1.0/2.0){
+	//		return 1.0/4.0;
+	//	}else{
+	//		return 3.0/4.0;
+	//	}
+	//}
 	
 	double qproduct(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, std::vector<double>& out1, std::vector<double>& out2, std::vector<double>& out3){
 		double score = 0.0;

@@ -1,7 +1,7 @@
-#filename = "test.txt"
-#savename = "test_k.txt"
-filename = "train.txt"
-savename = "train_k.txt"
+filename = "test.txt"
+savename = "test_k.txt"
+#filename = "train3.txt"
+#savename = "triple_train3.txt"
 with open(filename, "r") as f:
     x = []
     for line in f:
