@@ -13,7 +13,6 @@ public:
 		score = score_;
 	}
 
-	// check!!!
 	bool operator<(const RankScore& o) const {
 		return score > o.score;
 	}

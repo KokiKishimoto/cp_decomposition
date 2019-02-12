@@ -37,34 +37,38 @@ public:
 		return out1;
 	}
 
-	//double quantize(const double& x) {
-	//	if(x < 0){
-	//		return -1.0 / 3.0;
-	//	}else{
-	//		return 1.0 /3.0;
-	//	}
-	//}
-	
-	double quantize(const double& x) {
-		if(x < 0.5){
-			return 0.0;
-		}else{
-			return 1.0;
+	double ranking(const std::vector<double>& a, const std::vector<double>& b, const int& rank){
+		double rank_num = 0.0;
+		for(int i=0; i<a.size(); i++){
+			if(a[i]<rank){
+				rank_num++;       
+			}
+			if(b[i]<rank){
+				rank_num++;       
+			}
+			//std::cout << rank_num << std::endl;
 		}
+		return rank_num;
 	}
 
-	
-	//double quantize(const double& x) {
-	//	if(x < -1.0/2.0){
-	//		return -3.0 / 4.0;
-	//	}else if(-1.0/2.0<=x && x<0){
-	//		return -1.0 /4.0;
-	//	}else if(0<=x && x<1.0/2.0){
-	//		return 1.0/4.0;
-	//	}else{
-	//		return 3.0/4.0;
-	//	}
-	//}
+	double mrr(const std::vector<double>& a, const std::vector<double>& b){
+		double sum = 0.0;
+		double mrr_value = 0.0;
+		for(int i=0; i<a.size(); i++){
+			sum = sum + 1/(a[i]+1) + 1/(b[i]+1);
+		}
+		mrr_value = sum;
+		return mrr_value;
+	}
+
+
+	double quantize(const double& x) {
+		if(x < 0){
+			return -1.0 / 3.0;
+		}else{
+			return 1.0 /3.0;
+		}
+	}
 	
 	double qproduct(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, std::vector<double>& out1, std::vector<double>& out2, std::vector<double>& out3){
 		double score = 0.0;

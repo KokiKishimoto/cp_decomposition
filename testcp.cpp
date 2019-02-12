@@ -115,143 +115,6 @@ public:
 		}
 	}
 
-	void test_() {
-		double total = (double)testData.triples.size() * 2;
-		double mrr = 0.0, mrr_filter = 0.0;
-		double rank_1 = 0.0, rank_1_filter = 0.0;
-		double rank_3 = 0.0, rank_3_filter = 0.0;
-		double rank_5 = 0.0, rank_5_filter = 0.0;
-		double rank_10 = 0.0, rank_10_filter = 0.0;
-		int j=0;
-		for (Triple& test_tuple : testData.triples) {
-			if (test_tuple.flag) {
-				total = total - 2;
-				continue;
-			}
-			pre_score_(test_tuple.subj, test_tuple.relation, test_tuple.obj);
-			for (int entity = 0; entity<trainData.entity_counter; ++entity) {
-				RankScore& r1 = scores_subj[entity]; 
-				r1.set(entity, innerProductSubj(entity, outVec2));
-				RankScore& r2 = scores_obj[entity];
-				r2.set(entity, innerProductObj(entity, outVec3));
-			}
-			std::sort(scores_subj.begin(), scores_subj.end());
-			std::sort(scores_obj.begin(), scores_obj.end());
-
-			Key k_s(test_tuple.relation, test_tuple.obj);
-			Key k_o(test_tuple.relation, test_tuple.subj);
-			const std::set<int>& hypo_s = subjSet[k_s];
-			const std::set<int>& hypo_o = objSet[k_o];
-
-			int rank1 = -1, rank2 = -1;
-			int rank_filter_1 = -1, rank_filter_2 = -1;
-			int k = 0;
-			for (int i=0; i<scores_subj.size(); ++i) {
-				RankScore& r1 = scores_subj[i];
-				if (r1.id == test_tuple.subj) {
-					rank1 = i;
-					rank_filter_1 = k;
-					break;
-				}
-				if (hypo_s.find(r1.id) == hypo_s.end()) {
-					++k;
-				}
-			}
-			k=0;
-			for (int i=0; i<scores_obj.size(); ++i) {
-				RankScore& r1 = scores_obj[i];
-				if (r1.id == test_tuple.obj) {
-					rank2 = i;
-					rank_filter_2 = k;
-					break;
-				}
-				if (hypo_o.find(r1.id) == hypo_o.end()) {
-					++k;
-				}
-			}
-			std::cout << ++j << " " << rank1 << " " << rank2 << "\n " << rank_filter_1 << " " << rank_filter_2 << std::endl;
-			if (rank1 == 0) {
-				++rank_1;
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank1 <= 2) {
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank1 <= 4) {
-				++rank_5;
-				++rank_10;
-			} else if (rank1 <= 9) {
-				++rank_10;
-			}
-			
-			if (rank2 == 0) {
-				++rank_1;
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank2 <= 2) {
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank2 <= 4) {
-				++rank_5;
-				++rank_10;
-			} else if (rank2 <= 9) {
-				++rank_10;
-			}
-			
-			mrr += 1.0/(rank1+1.0);
-			mrr += 1.0/(rank2+1.0);
-			
-			if (rank_filter_1 == 0) {
-				++rank_1_filter;
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_1 <= 2) {
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_1 <= 4) {
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_1 <= 9) {
-				++rank_10_filter;
-			}
-			
-			if (rank_filter_2 == 0) {
-				++rank_1_filter;
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_2 <= 2) {
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_2 <= 4) {
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_2 <= 9) {
-				++rank_10_filter;
-			}
-			mrr_filter += 1.0/(rank_filter_1+1.0);
-			mrr_filter += 1.0/(rank_filter_2+1.0);
-		}
-		std::cout << "Raw Rank1: " << (rank_1 / total) << "\n";
-		std::cout << "Raw Rank3: " << (rank_3 / total) << "\n";
-		std::cout << "Raw Rank5: " << (rank_5 / total) << "\n";
-		std::cout << "Raw Rank10: " << (rank_10 / total) << "\n";
-		std::cout << "Raw MRR: " << (mrr / total) << "\n";
-		
-		std::cout << "Filtered Rank1: " << (rank_1_filter / total) << "\n";
-		std::cout << "Filtered Rank3: " << (rank_3_filter / total) << "\n";
-		std::cout << "Filtered Rank5: " << (rank_5_filter / total) << "\n";
-		std::cout << "Filtered Rank10: " << (rank_10_filter / total) << "\n";
-		std::cout << "Filtered MRR: " << (mrr_filter / total) << "\n";
-	}
-	
 	void test_inv() {
 		double total = (double)testData.triples.size() * 2;
 		double mrr = 0.0, mrr_filter = 0.0;
@@ -260,11 +123,10 @@ public:
 		double rank_5 = 0.0, rank_5_filter = 0.0;
 		double rank_10 = 0.0, rank_10_filter = 0.0;
 		int j=0;
+		std::vector<double> rank1, rank2;
+		std::vector<double> rank_filter_1, rank_filter_2;
+		
 		for (Triple& test_tuple : testData.triples) {
-			if (test_tuple.flag) {
-				total = total - 2;
-				continue;
-			}
 			pre_score_inv(test_tuple.subj, test_tuple.relation, test_tuple.relation_rev, test_tuple.obj);
 			for (int entity = 0; entity<trainData.entity_counter; ++entity) {
 				RankScore& r1 = scores_subj[entity]; 
@@ -279,14 +141,12 @@ public:
 			const std::set<int>& hypo_s = subjSet[k_s];
 			const std::set<int>& hypo_o = objSet[k_o];
 
-			int rank1 = -1, rank2 = -1;
-			int rank_filter_1 = -1, rank_filter_2 = -1;
 			int k = 0;
 			for (int i=0; i<scores_subj.size(); ++i) {
 				RankScore& r1 = scores_subj[i];
 				if (r1.id == test_tuple.subj) {
-					rank1 = i;
-					rank_filter_1 = k;
+					rank1.push_back(i);
+					rank_filter_1.push_back(k);
 					break;
 				}
 				if (hypo_s.find(r1.id) == hypo_s.end()) {
@@ -297,84 +157,28 @@ public:
 			for (int i=0; i<scores_obj.size(); ++i) {
 				RankScore& r1 = scores_obj[i];
 				if (r1.id == test_tuple.obj) {
-					rank2 = i;
-					rank_filter_2 = k;
+					rank2.push_back(i);
+					rank_filter_2.push_back(k);
 					break;
 				}
 				if (hypo_o.find(r1.id) == hypo_o.end()) {
 					++k;
 				}
 			}
-			std::cout << ++j << " " << rank1 << " " << rank2 << "\n " << rank_filter_1 << " " << rank_filter_2 << std::endl;
-			if (rank1 == 0) {
-				++rank_1;
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank1 <= 2) {
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank1 <= 4) {
-				++rank_5;
-				++rank_10;
-			} else if (rank1 <= 9) {
-				++rank_10;
-			}
-			
-			if (rank2 == 0) {
-				++rank_1;
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank2 <= 2) {
-				++rank_3;
-				++rank_5;
-				++rank_10;
-			} else if (rank2 <= 4) {
-				++rank_5;
-				++rank_10;
-			} else if (rank2 <= 9) {
-				++rank_10;
-			}
-			
-			mrr += 1.0/(rank1+1.0);
-			mrr += 1.0/(rank2+1.0);
-			
-			if (rank_filter_1 == 0) {
-				++rank_1_filter;
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_1 <= 2) {
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_1 <= 4) {
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_1 <= 9) {
-				++rank_10_filter;
-			}
-			
-			if (rank_filter_2 == 0) {
-				++rank_1_filter;
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_2 <= 2) {
-				++rank_3_filter;
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_2 <= 4) {
-				++rank_5_filter;
-				++rank_10_filter;
-			} else if (rank_filter_2 <= 9) {
-				++rank_10_filter;
-			}
-			mrr_filter += 1.0/(rank_filter_1+1.0);
-			mrr_filter += 1.0/(rank_filter_2+1.0);
+
 		}
+		rank_1 = op.ranking(rank1, rank2, 1);
+		rank_3 = op.ranking(rank1, rank2, 3);
+		rank_5 = op.ranking(rank1, rank2, 5);
+		rank_10 = op.ranking(rank1, rank2, 10);
+		mrr = op.mrr(rank1, rank2);
+
+		rank_1_filter = op.ranking(rank_filter_1, rank_filter_2, 1);
+		rank_3_filter = op.ranking(rank_filter_1, rank_filter_2, 3);
+		rank_5_filter = op.ranking(rank_filter_1, rank_filter_2, 5);
+		rank_10_filter = op.ranking(rank_filter_1, rank_filter_2, 10);
+		mrr_filter = op.mrr(rank_filter_1, rank_filter_2);
+
 		std::cout << "Raw Rank1: " << (rank_1 / total) << "\n";
 		std::cout << "Raw Rank3: " << (rank_3 / total) << "\n";
 		std::cout << "Raw Rank5: " << (rank_5 / total) << "\n";
@@ -447,11 +251,6 @@ int main(int argc, char **argv){
 	if ((i = ArgPos((char *)"-relation_model", argc, argv)) > 0) relationname = argv[i + 1];
 	TestCP test(trainname, testname, validname, subjectname, objectname, relationname);
 
-	bool isInverse = true;
-	if (isInverse) {
-		test.test_inv();
-	} else {
-		test.test_();
-	}
+	test.test_inv();
 	return 0;
 }

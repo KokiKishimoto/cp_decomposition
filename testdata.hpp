@@ -23,7 +23,6 @@ public:
 			int obj = addEntity(t2, traindata);
 			int relation = addRelation(t1, traindata);
 			triples.emplace_back(subj, relation, obj);
-			if (subj == -1 || obj == -1 || relation == -1) triples.back().flag = true;
 		}
 		fin.close();
 	}
@@ -39,7 +38,6 @@ public:
 			int relation = addRelation(t1, traindata);
 			int relation_rev = addRelation("**" + t1, traindata);
 			triples.emplace_back(subj, relation, relation_rev, obj);
-			if (subj == -1 || obj == -1 || relation == -1 || relation_rev == -1) triples.back().flag = true;
 		}
 		fin.close();
 	}
