@@ -36,28 +36,13 @@ public:
 		std::uniform_real_distribution<> dist(-bnd, bnd);
 
 		subjVec.resize(traindata.entity_counter);
-		for (int i = 0; i < traindata.entity_counter; i++) {
-			subjVec[i].resize(vecDim);
-			for (int j = 0; j < vecDim; j++) {
-				subjVec[i][j] = dist(rnd);
-			}
-		}
+		initializeModel(subjVec, traindata.entity_counter);
 
 		objVec.resize(traindata.entity_counter);
-		for (int i = 0; i < traindata.entity_counter; i++) {
-			objVec[i].resize(vecDim);
-			for (int j = 0; j < vecDim; j++) {
-				objVec[i][j] = dist(rnd);
-			}
-		}
+		initizlizeModel(objVec, traindata.entity_counter);
 
 		relationVec.resize(traindata.relation_counter);
-		for (int i = 0; i < traindata.relation_counter; i++) {
-			relationVec[i].resize(vecDim);
-			for (int j = 0; j < vecDim; j++) {
-				relationVec[i][j] = dist(rnd);
-			}
-		}
+		initizlizeModel(relationVec, traindata.relation_counter);
 
 		updater = Updater(learningRate, threshold);
 
@@ -66,6 +51,14 @@ public:
 		outVec3.resize(vecDim);
 
 		norms.resize(3);
+	}
+	void initializeModel(std::vector< std::vector<double> >& Vec, const int counter){
+		for (int i = 0; i < counter; i++) {
+			Vec[i].resize(vecDim);
+			for (int j = 0; j < vecDim; j++) {
+				Vec[i][j] = dist(rnd);
+			}
+		}
 	}
 
 	double sigmoid(double x) { return 1.0 / (1.0 + std::exp(-x));}
@@ -164,20 +157,14 @@ int ArgPos(std::string str, int argc, char **argv) {
 
 int main(int argc, char **argv){
 	std::string trainname;
-	//std::string testname;
-	//std::string validname;
 	int dimension;
 	int iteration;
-	//std::string testidname;
 	double rate;
 	double lambda;
 	int i;
 	if ((i = ArgPos((char *)"-train", argc, argv)) > 0) trainname = argv[i + 1];
-	//if ((i = ArgPos((char *)"-test", argc, argv)) > 0) testname = argv[i + 1];
-	//if ((i = ArgPos((char *)"-valid", argc, argv)) > 0) validname = argv[i + 1];
 	if ((i = ArgPos((char *)"-dimension", argc, argv)) > 0) dimension = atoi(argv[i + 1]);
 	if ((i = ArgPos((char *)"-iteration", argc, argv)) > 0) iteration = atoi(argv[i + 1]);
-	//if ((i = ArgPos((char *)"-testid", argc, argv)) > 0) testidname = argv[i + 1];
 	if ((i = ArgPos((char *)"-rate", argc, argv)) > 0) rate = std::stof(argv[i + 1]);
 	if ((i = ArgPos((char *)"-lambda", argc, argv)) > 0) lambda = std::stof(argv[i + 1]);
 

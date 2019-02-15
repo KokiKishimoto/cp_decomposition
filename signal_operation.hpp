@@ -3,6 +3,8 @@
 
 #include <cmath>
 #include <vector>
+#include <iostream>
+
 
 class SignalOperation {
 public:
@@ -37,29 +39,7 @@ public:
 		return out1;
 	}
 
-	double ranking(const std::vector<double>& a, const std::vector<double>& b, const int& rank){
-		double rank_num = 0.0;
-		for(int i=0; i<a.size(); i++){
-			if(a[i]<rank){
-				rank_num++;       
-			}
-			if(b[i]<rank){
-				rank_num++;       
-			}
-			//std::cout << rank_num << std::endl;
-		}
-		return rank_num;
-	}
 
-	double mrr(const std::vector<double>& a, const std::vector<double>& b){
-		double sum = 0.0;
-		double mrr_value = 0.0;
-		for(int i=0; i<a.size(); i++){
-			sum = sum + 1/(a[i]+1) + 1/(b[i]+1);
-		}
-		mrr_value = sum;
-		return mrr_value;
-	}
 
 
 	double quantize(const double& x) {

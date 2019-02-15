@@ -1,11 +1,11 @@
 #!/bin/sh
 
-unzip ./wordnet-mlj12.zip
+#unzip ./wordnet-mlj12.zip
 
 model_dir=./model
 
 make all
-
+#
 ./add_rev.out -file_name ./wordnet-mlj12/wordnet-mlj12-train.txt -rev_filename ./wordnet-mlj12/a.txt
 
 mkdir -p $model_dir

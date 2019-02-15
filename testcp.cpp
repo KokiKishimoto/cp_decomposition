@@ -2,6 +2,7 @@
 #include "data.hpp"
 #include "testdata.hpp"
 #include "signal_operation.hpp"
+#include "model_file_load.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -18,13 +19,16 @@ public:
 	std::vector<RankScore> scores_subj, scores_obj;
 	Data trainData;
 	TestData testData, validData;
+	ModelFileLoad subjData, objData, relationData;
 	std::vector< std::vector<double> > subjVec, objVec, relationVec;
 	std::vector<double> outVec1, outVec2, outVec3;
 	std::vector<double> outVec1_inv, outVec2_inv, outVec3_inv;
 	SignalOperation op;
 	std::map<Key, std::set<int> > subjSet, objSet;
 	int vecDim;
-	//bool isInverse;
+	int k;
+	std::vector<double> rank1, rank2;
+	std::vector<double> rank_filter_1, rank_filter_2;
 
 	TestCP(std::string dataFile, std::string testFile, std::string validFile, std::string modelSubjFile, std::string modelObjFile, std::string modelRelFile) {
 		trainData = Data();
@@ -36,48 +40,19 @@ public:
 		scores_subj.resize(trainData.entity_counter, RankScore());
 		scores_obj.resize(trainData.entity_counter, RankScore());
 
-		std::ifstream fin;
+		subjData = ModelFileLoad();
+		subjData.model_load(modelSubjFile);
+		subjVec = subjData.Vec;
 
-		fin.open(modelSubjFile);
-		int entitySize;
-		fin >> entitySize >> vecDim;
-		subjVec.resize(entitySize);
-		for (int i = 0; i < entitySize; i++) {
-			std::string tmp;
-			fin >> tmp;
-			subjVec[i].resize(vecDim);
-			for (int j = 0; j < vecDim; j++) {
-				fin >> subjVec[i][j];
-			}
-		}
-		fin.close();
+		objData = ModelFileLoad();
+		objData.model_load(modelObjFile);
+		objVec = objData.Vec;
 
-		fin.open(modelObjFile);
-		fin >> entitySize >> vecDim;
-		objVec.resize(entitySize);
-		for (int i = 0; i < entitySize; i++) {
-			std::string tmp;
-			fin >> tmp;
-			objVec[i].resize(vecDim);
-			for (int j = 0; j < vecDim; j++) {
-				fin >> objVec[i][j];
-			}
-		}
-		fin.close();
+		relationData = ModelFileLoad();
+		relationData.model_load(modelRelFile);
+		relationVec = relationData.Vec;
 
-		fin.open(modelRelFile);
-		int relationSize;
-		fin >> relationSize >> vecDim;
-		relationVec.resize(relationSize);
-		for (int i = 0; i < relationSize; i++) {
-			std::string tmp;
-			fin >> tmp;
-			relationVec[i].resize(vecDim);
-			for (int j = 0; j < vecDim; j++) {
-				fin >> relationVec[i][j];
-			}
-		}
-		fin.close();
+		vecDim = subjData.Size;
 
 		op = SignalOperation();
 		outVec1.resize(vecDim);
@@ -88,31 +63,12 @@ public:
 		outVec2_inv.resize(vecDim);
 		outVec3_inv.resize(vecDim);
 
-		for (Triple& t : trainData.triples) {
-			Key k1(t.relation, t.obj);
-			subjSet[k1].insert(t.subj);
-
-			Key k2(t.relation, t.subj);
-			objSet[k2].insert(t.obj);
-		}
-
-		for (Triple& t : testData.triples) {
-			Key k1(t.relation, t.obj);
-			subjSet[k1].insert(t.subj);
-
-			Key k2(t.relation, t.subj);
-			objSet[k2].insert(t.obj);
-		}
+		generate_key(trainData.triples);
+		generate_key(testData.triples);
 
 		validData = TestData();
 		validData.readFromRawFile(validFile, trainData);
-		for (Triple& t : validData.triples) {
-			Key k1(t.relation, t.obj);
-			subjSet[k1].insert(t.subj);
-
-			Key k2(t.relation, t.subj);
-			objSet[k2].insert(t.obj);
-		}
+		generate_key(validData.triples);
 	}
 
 	void test_inv() {
@@ -123,8 +79,6 @@ public:
 		double rank_5 = 0.0, rank_5_filter = 0.0;
 		double rank_10 = 0.0, rank_10_filter = 0.0;
 		int j=0;
-		std::vector<double> rank1, rank2;
-		std::vector<double> rank_filter_1, rank_filter_2;
 		
 		for (Triple& test_tuple : testData.triples) {
 			pre_score_inv(test_tuple.subj, test_tuple.relation, test_tuple.relation_rev, test_tuple.obj);
@@ -134,50 +88,21 @@ public:
 				RankScore& r2 = scores_obj[entity];
 				r2.set(entity, innerProductObj(entity, outVec3) + innerProductSubj(entity, outVec2_inv));
 			}
-			std::sort(scores_subj.begin(), scores_subj.end());
-			std::sort(scores_obj.begin(), scores_obj.end());
-			Key k_s(test_tuple.relation, test_tuple.obj);
-			Key k_o(test_tuple.relation, test_tuple.subj);
-			const std::set<int>& hypo_s = subjSet[k_s];
-			const std::set<int>& hypo_o = objSet[k_o];
-
-			int k = 0;
-			for (int i=0; i<scores_subj.size(); ++i) {
-				RankScore& r1 = scores_subj[i];
-				if (r1.id == test_tuple.subj) {
-					rank1.push_back(i);
-					rank_filter_1.push_back(k);
-					break;
-				}
-				if (hypo_s.find(r1.id) == hypo_s.end()) {
-					++k;
-				}
-			}
-			k=0;
-			for (int i=0; i<scores_obj.size(); ++i) {
-				RankScore& r1 = scores_obj[i];
-				if (r1.id == test_tuple.obj) {
-					rank2.push_back(i);
-					rank_filter_2.push_back(k);
-					break;
-				}
-				if (hypo_o.find(r1.id) == hypo_o.end()) {
-					++k;
-				}
-			}
+			generate_rank(scores_subj, test_tuple.relation, test_tuple.subj, test_tuple.obj, subjSet, rank1, rank_filter_1);
+			generate_rank(scores_obj, test_tuple.relation, test_tuple.obj, test_tuple.subj, objSet, rank2, rank_filter_2);
 
 		}
-		rank_1 = op.ranking(rank1, rank2, 1);
-		rank_3 = op.ranking(rank1, rank2, 3);
-		rank_5 = op.ranking(rank1, rank2, 5);
-		rank_10 = op.ranking(rank1, rank2, 10);
-		mrr = op.mrr(rank1, rank2);
+		rank_1 = calculate_ranking(rank1, rank2, 1);
+		rank_3 = calculate_ranking(rank1, rank2, 3);
+		rank_5 = calculate_ranking(rank1, rank2, 5);
+		rank_10 = calculate_ranking(rank1, rank2, 10);
+		mrr = calate_mrr(rank1, rank2);
 
-		rank_1_filter = op.ranking(rank_filter_1, rank_filter_2, 1);
-		rank_3_filter = op.ranking(rank_filter_1, rank_filter_2, 3);
-		rank_5_filter = op.ranking(rank_filter_1, rank_filter_2, 5);
-		rank_10_filter = op.ranking(rank_filter_1, rank_filter_2, 10);
-		mrr_filter = op.mrr(rank_filter_1, rank_filter_2);
+		rank_1_filter = calculate_ranking(rank_filter_1, rank_filter_2, 1);
+		rank_3_filter = calculate_ranking(rank_filter_1, rank_filter_2, 3);
+		rank_5_filter = calculate_ranking(rank_filter_1, rank_filter_2, 5);
+		rank_10_filter = calculate_ranking(rank_filter_1, rank_filter_2, 10);
+		mrr_filter = calate_mrr(rank_filter_1, rank_filter_2);
 
 		std::cout << "Raw Rank1: " << (rank_1 / total) << "\n";
 		std::cout << "Raw Rank3: " << (rank_3 / total) << "\n";
@@ -193,6 +118,56 @@ public:
 	}
 
 private:
+	double calate_mrr(const std::vector<double>& a, const std::vector<double>& b){
+		double sum = 0.0;
+		double mrr_value = 0.0;
+		for(int i=0; i<a.size(); i++){
+			sum = sum + 1/(a[i]+1) + 1/(b[i]+1);
+		}
+		mrr_value = sum;
+		return mrr_value;
+	}
+
+	double calculate_ranking(std::vector<double>& a, std::vector<double>& b, int rank){
+		double rank_num = 0.0;
+		for(int i=0; i<a.size(); i++){
+			if(a[i]<rank){
+				rank_num++;       
+			}
+			if(b[i]<rank){
+				rank_num++;       
+			}
+		}
+		return rank_num;
+	}
+	void generate_key(std::vector<Triple>& triples){
+		for (Triple& t : triples) {
+			Key k1(t.relation, t.obj);
+			subjSet[k1].insert(t.subj);
+
+			Key k2(t.relation, t.subj);
+			objSet[k2].insert(t.obj);
+		}
+	}
+	void generate_rank(std::vector<RankScore>& scores_ent, int relation, int ent1, int ent2, std::map<Key, std::set<int> >& entSet, std::vector<double>& rank, std::vector<double>& rank_filter){
+		std::sort(scores_ent.begin(), scores_ent.end());
+		Key k_e(relation, ent2);
+		const std::set<int>& hypo_e = entSet[k_e];
+		int k = 0;
+		for (int i=0; i<scores_ent.size(); ++i) {
+			RankScore& re = scores_ent[i];
+			if (re.id == ent1) {
+				rank.push_back(i);
+				rank_filter.push_back(k);
+				std::cout << i << ' ' << k << std::endl;
+				break;
+			}
+			if (hypo_e.find(re.id) == hypo_e.end()) {
+				++k;
+			}
+		}
+	}
+
 	void pre_score_(int subj, int relation, int obj) {
 		const std::vector<double>& obj_v = objVec[obj];
 		const std::vector<double>& relation_v = relationVec[relation];
