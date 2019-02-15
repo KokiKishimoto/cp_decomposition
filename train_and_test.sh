@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#unzip ./wordnet-mlj12.zip
+unzip ./wordnet-mlj12.zip
 
 model_dir=./model
 
