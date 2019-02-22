@@ -52,7 +52,7 @@ public:
 		relationData.model_load(modelRelFile);
 		relationVec = relationData.Vec;
 
-		vecDim = subjData.Size;
+		vecDim = subjData.vecDim;
 
 		op = SignalOperation();
 		outVec1.resize(vecDim);
@@ -81,6 +81,10 @@ public:
 		int j=0;
 		
 		for (Triple& test_tuple : testData.triples) {
+			if (test_tuple.flag) {
+				total = total - 2;
+				continue;
+			}
 			pre_score_inv(test_tuple.subj, test_tuple.relation, test_tuple.relation_rev, test_tuple.obj);
 			for (int entity = 0; entity<trainData.entity_counter; ++entity) {
 				RankScore& r1 = scores_subj[entity]; 

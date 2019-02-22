@@ -4,14 +4,17 @@
 class Triple {
 public:
 	int subj, obj, relation, relation_rev;
+	bool flag;
 
-	Triple(){}
+	Triple() : flag(false) {}
 	Triple(int subj_, int relation_, int obj_) {
 		set(subj_, relation_, obj_);
+		flag = false;
 	}
 
 	Triple(int subj_, int relation_, int relation_rev_, int obj_) {
 		set(subj_, relation_, relation_rev_, obj_);
+		flag = false;
 	}
 
 	void set(int subj_, int relation_, int obj_) {
