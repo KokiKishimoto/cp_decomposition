@@ -36,13 +36,13 @@ public:
 		std::uniform_real_distribution<> dist(-bnd, bnd);
 
 		subjVec.resize(traindata.entity_counter);
-		initializeModel(subjVec, traindata.entity_counter);
+		initializeModel(subjVec, traindata.entity_counter, dist);
 
 		objVec.resize(traindata.entity_counter);
-		initizlizeModel(objVec, traindata.entity_counter);
+		initializeModel(objVec, traindata.entity_counter, dist);
 
 		relationVec.resize(traindata.relation_counter);
-		initizlizeModel(relationVec, traindata.relation_counter);
+		initializeModel(relationVec, traindata.relation_counter, dist);
 
 		updater = Updater(learningRate, threshold);
 
@@ -52,7 +52,7 @@ public:
 
 		norms.resize(3);
 	}
-	void initializeModel(std::vector< std::vector<double> >& Vec, const int counter){
+	void initializeModel(std::vector< std::vector<double> >& Vec, const int counter, std::uniform_real_distribution<>& dist){
 		for (int i = 0; i < counter; i++) {
 			Vec[i].resize(vecDim);
 			for (int j = 0; j < vecDim; j++) {
