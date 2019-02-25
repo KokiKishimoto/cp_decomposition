@@ -11,7 +11,6 @@ mkdir -p $model_dir
 	-dimension 200 \
 	-iteration 400 \
 	-rate 0.025 \
-	-lambda 0.0001 \
 	-model_dir $model_dir
 
 ./testcp.out -train ./datasets/FB15k-237/train_rev.txt \

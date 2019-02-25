@@ -24,11 +24,10 @@ public:
 	std::vector<double> norms;
 
 	double fs;
-	double lambda;
 	int vecDim;
 	std::mt19937 rnd; //int randomSeed;
 
-	QuantizeCP(Data& traindata, int vecDim_, int randomSeed, double learningRate, double threshold, double lambda_) : vecDim(vecDim_), lambda(lambda_) {
+	QuantizeCP(Data& traindata, int vecDim_, int randomSeed, double learningRate, double threshold) : vecDim(vecDim_){
 		op = SignalOperation();
 
 		rnd = std::mt19937(randomSeed);
@@ -170,23 +169,18 @@ int main(int argc, char **argv){
 	int iteration;
 	//std::string testidname;
 	double rate;
-	double lambda;
 	int i;
 	if ((i = ArgPos((char *)"-train", argc, argv)) > 0) trainname = argv[i + 1];
-	//if ((i = ArgPos((char *)"-test", argc, argv)) > 0) testname = argv[i + 1];
-	//if ((i = ArgPos((char *)"-valid", argc, argv)) > 0) validname = argv[i + 1];
 	if ((i = ArgPos((char *)"-dimension", argc, argv)) > 0) dimension = atoi(argv[i + 1]);
 	if ((i = ArgPos((char *)"-iteration", argc, argv)) > 0) iteration = atoi(argv[i + 1]);
-	//if ((i = ArgPos((char *)"-testid", argc, argv)) > 0) testidname = argv[i + 1];
 	if ((i = ArgPos((char *)"-rate", argc, argv)) > 0) rate = std::stof(argv[i + 1]);
-	if ((i = ArgPos((char *)"-lambda", argc, argv)) > 0) lambda = std::stof(argv[i + 1]);
 
 	Data data;
 	data.readFromRawFile(trainname);
 
 	int randomSeed = 0;
 	double threshold = 5.0;
-	QuantizeCP quantizecp(data, dimension, randomSeed, rate, threshold, lambda);
+	QuantizeCP quantizecp(data, dimension, randomSeed, rate, threshold);
 
 	ModelFileWriter mfw;
 	int negativeSize = 5;
